@@ -1,0 +1,10 @@
+cff-version: 0.1.0
+title: pybdshadow - a python package to generate building shadow geometry
+authors:
+  - name: Qing Yu
+    orcid: 0000-0003-2513-2969
+  - name: Ge Li
+date-released:
+license: "BSD 3"
+repository-code: "https://github.com/ni1o1/pybdshadow"
+message: "If you use this software, please cite relevant articles below."
