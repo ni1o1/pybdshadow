@@ -1,0 +1,3 @@
+rtree
+geopandas
+matplotlib
