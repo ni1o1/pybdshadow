@@ -35,7 +35,7 @@ import numpy as np
 import geopandas as gpd
 
 
-def vis_bd(building,buildingshadow,zoom='auto', height=500):
+def show_bd(building,buildingshadow,zoom='auto', height=500):
     displaybuilding = building.copy()
     displaybuildingshadow = buildingshadow.copy()
     try:

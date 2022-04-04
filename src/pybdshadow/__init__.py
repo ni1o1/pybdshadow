@@ -46,6 +46,6 @@ from .pybdshadow import (
     bdshadow
 )
 from .visualization import (
-   vis_bd,
+   show_bd,
 )
-__all__ = ['calSunShadow','calBdShadow','bdshadow','vis_bd']
+__all__ = ['calSunShadow','calBdShadow','bdshadow','show_bd']
