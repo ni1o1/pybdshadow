@@ -1,2 +1,5 @@
-# pybdshadow
- Python package to generate build shadow geometry
+# [WIP]pybdshadow
+
+![1649074615552.png](image/README/1649074615552.png)
+
+Python package to generate build shadow geometry

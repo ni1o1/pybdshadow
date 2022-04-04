@@ -1,0 +1,4 @@
+prune docs
+prune example
+prune image
+prune src/pybdshadow/tests
