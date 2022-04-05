@@ -29,6 +29,8 @@ pybdshadow.show_bdshadow(buildings = buildings,shadows = shadows)
 
 ![1649161376291.png](https://github.com/ni1o1/pybdshadow/raw/main/image/README/1649161376291.png)
 
+Detail usage can be found in [this example](https://github.com/ni1o1/pybdshadow/blob/main/example/example.ipynb).
+
 ## Installation
 
 It is recommended to use `Python 3.7, 3.8, 3.9`
