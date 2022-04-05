@@ -20,7 +20,7 @@ class Testpybdshadow:
         truth = 5.76296081373734e-07
         assert np.allclose(area,truth)
 
-        pybdshadow.show_bdshadow(building=building,
-                                shadow=buildingshadow)
+        pybdshadow.show_bdshadow(buildings=building,
+                                shadows=buildingshadow)
 
 
