@@ -136,7 +136,6 @@ def calSunShadow(shape, shapeHeight, sunPosition):
 # 输入的shape是一个矩阵（n*2*2) n个建筑物面，每个建筑有2个点，每个点有三个维度
 # shapeHeight(n) 每一栋建筑的高度都是一样的
 def calSunShadow1(shape, shapeHeight, sunPosition):
-    time_start = time.time()  # 记录结束时间
     azimuth = (sunPosition['azimuth'])
     altitude = (sunPosition['altitude'])
 
@@ -164,11 +163,8 @@ def calSunShadow1(shape, shapeHeight, sunPosition):
     shadowShape[:, 2, :] = temp
 
     shadowShape[:, 4, :] = shadowShape[:, 0, :]
-    time_end = time.time()  # 记录结束时间
-    time_sum = time_end - time_start  # 计算的时间差为程序的执行时间，单位为秒/s
-    print(time_sum)
 
-    return shadowShape[:, 0:1, :]
+    return shadowShape
 
 
 # 计算广告牌每个面的阴影
