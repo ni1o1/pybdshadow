@@ -1,4 +1,4 @@
-# [WIP]pybdshadow
+# pybdshadow
 
 ![1649074615552.png](https://github.com/ni1o1/pybdshadow/raw/main/image/README/1649074615552.png)
 
