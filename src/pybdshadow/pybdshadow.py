@@ -107,17 +107,12 @@ def calPlaneByTwoVectors(n1, n2, p):
 def calSunShadow(shape, shapeHeight, sunPosition):
     azimuth = (sunPosition['azimuth'])
     altitude = (sunPosition['altitude'])
-    symbol = [1, -1]  # 经度，纬度的符号
-
-    if azimuth < 0:
-        azimuth += math.pi
-        symbol[0] *= -1
 
     distance = shapeHeight/math.tan(altitude)
 
     # 计算投影位置偏移
-    lonDistance = symbol[0]*distance*math.sin(azimuth)
-    latDistance = symbol[1]*distance*math.cos(azimuth)
+    lonDistance = distance*math.sin(azimuth)
+    latDistance = distance*math.cos(azimuth)
 
     shadowShape = []
     for i in range(0, 2):
@@ -142,17 +137,13 @@ def calSunShadow(shape, shapeHeight, sunPosition):
 def calSunShadow1(shape, shapeHeight, sunPosition):
     azimuth = (sunPosition['azimuth'])
     altitude = (sunPosition['altitude'])
-    symbol = [1, -1]  # 经度，纬度的符号
 
-    if azimuth < 0:
-        azimuth += math.pi
-        symbol[0] *= -1
 
     distance = shapeHeight/math.tan(altitude)
 
     # 计算投影位置偏移
-    lonDistance = symbol[0]*distance*math.sin(azimuth)  # n个偏移量[n]
-    latDistance = symbol[1]*distance*math.cos(azimuth)
+    lonDistance = distance*math.sin(azimuth)  # n个偏移量[n]
+    latDistance = distance*math.cos(azimuth)
 
     n = np.shape(shape)[0]
     shadowShape = np.zeros((n, 5, 2))  # n个建筑物面，每个面都有5个点，每个点都有个维数
