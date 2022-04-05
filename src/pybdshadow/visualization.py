@@ -30,12 +30,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import pandas as pd
 import numpy as np
 import geopandas as gpd
 
 
-def show_bdshadow(buildings=gpd.GeoDataFrame(), shadows=gpd.GeoDataFrame(), height='height', zoom='auto'):
+def show_bdshadow(buildings=gpd.GeoDataFrame(),
+                  shadows=gpd.GeoDataFrame(),
+                  height='height',
+                  zoom='auto'):
     '''
     Visualize the building and shadow with keplergl.
 
@@ -119,18 +121,24 @@ def show_bdshadow(buildings=gpd.GeoDataFrame(), shadows=gpd.GeoDataFrame(), heig
                                'strokeColorScale': 'quantile',
                                'sizeField': None,
                                'sizeScale': 'linear',
-                               'heightField': {'name': 'height', 'type': 'integer'},
+                               'heightField': {
+                                   'name': 'height',
+                                   'type': 'integer'},
                                'heightScale': 'linear',
                                'radiusField': None,
                                'radiusScale': 'linear'}})
-        bdcentroid =displaybuilding['geometry'].bounds[['minx','miny','maxx','maxy']]
-        lon_center, lat_center = bdcentroid['minx'].mean(), bdcentroid['miny'].mean()
+        bdcentroid = displaybuilding['geometry'].bounds[[
+            'minx', 'miny', 'maxx', 'maxy']]
+        lon_center, lat_center = bdcentroid['minx'].mean(
+        ), bdcentroid['miny'].mean()
         lon_min, lon_max = bdcentroid['minx'].min(), bdcentroid['maxx'].max()
     if len(displaybuildingshadow) == 0:
         displaybuildingshadow['geometry'] = []
     else:
-        bdcentroid =displaybuildingshadow['geometry'].bounds[['minx','miny','maxx','maxy']]
-        lon_center, lat_center = bdcentroid['minx'].mean(), bdcentroid['miny'].mean()
+        bdcentroid = displaybuildingshadow['geometry'].bounds[[
+            'minx', 'miny', 'maxx', 'maxy']]
+        lon_center, lat_center = bdcentroid['minx'].mean(
+        ), bdcentroid['miny'].mean()
         lon_min, lon_max = bdcentroid['minx'].min(), bdcentroid['maxx'].max()
         vmapdata['shadow'] = displaybuildingshadow
         layers.append(

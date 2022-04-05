@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import pandas as pd
 import geopandas as gpd
 from suncalc import get_position
+import shapely
 from shapely.geometry import Polygon
 import math
 import numpy as np
@@ -154,9 +155,9 @@ def calSunShadow1(shape, shapeHeight, sunPosition):
     latDistance = symbol[1]*distance*math.cos(azimuth)
 
     n = np.shape(shape)[0]
-    shadowShape = np.zeros(n, 5, 2)  # n个建筑物面，每个面都有5个点，每个点都有个维数
+    shadowShape = np.zeros((n, 5, 2))  # n个建筑物面，每个面都有5个点，每个点都有个维数
 
-    shadowShape[:, 0:1, :] += shape  # 前两个点不变
+    shadowShape[:, 0:2, :] += shape  # 前两个点不变
     shadowShape[:, 2:3, 0] += shape + lonDistance
     shadowShape[:, 2:3, 1] += shape + latDistance
     temp = shadowShape[:, 3, :]
@@ -263,3 +264,41 @@ def bdshadow_sunlight(buildings, date, height='height', ground=0, epsg=3857):
     # transform coordinate system back to wgs84
     shadows = buildingshadow.to_crs(epsg=4326)
     return shadows
+
+
+def bd_preprocess(buildings):
+    '''
+    Preprocess building data, so that we can perform shadow calculation.
+    Remove empty polygons and convert multipolygons into polygons.
+
+    **Parameters**
+    buildings : GeoDataFrame
+        Buildings. 
+
+    **Return**
+    allbds : GeoDataFrame
+        Polygon buildings
+    '''
+    buildings = buildings[buildings.is_valid]
+    polygon_buildings = buildings[buildings['geometry'].apply(
+        lambda r:type(r) == shapely.geometry.polygon.Polygon)]
+    multipolygon_buildings = buildings[buildings['geometry'].apply(
+        lambda r:type(r) == shapely.geometry.multipolygon.MultiPolygon)]
+    allbds = []
+    for j in range(len(multipolygon_buildings)):
+        r = multipolygon_buildings.iloc[j]
+        singlebd = gpd.GeoDataFrame()
+        singlebd['geometry'] = list(r['geometry'].geoms)
+        for i in r.index:
+            if i != 'geometry':
+                singlebd[i] = r[i]
+        allbds.append(singlebd)
+    allbds.append(polygon_buildings)
+    allbds = pd.concat(allbds)
+    return allbds
+
+'''
+待开发功能:
+1. 广告阴影计算
+2. 太阳阴影的向量计算
+'''
