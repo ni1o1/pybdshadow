@@ -36,6 +36,7 @@ import shapely
 from shapely.geometry import Polygon
 import math
 import numpy as np
+import time
 # 读取shp格式的文件并保存
 
 # 计算空间直线与平面的交点
@@ -135,27 +136,37 @@ def calSunShadow(shape, shapeHeight, sunPosition):
 # 输入的shape是一个矩阵（n*2*2) n个建筑物面，每个建筑有2个点，每个点有三个维度
 # shapeHeight(n) 每一栋建筑的高度都是一样的
 def calSunShadow1(shape, shapeHeight, sunPosition):
+    time_start = time.time()  # 记录结束时间
     azimuth = (sunPosition['azimuth'])
     altitude = (sunPosition['altitude'])
 
-
+    n = np.shape(shape)[0]
     distance = shapeHeight/math.tan(altitude)
 
     # 计算投影位置偏移
+    
+    #lonDistance = np.zeros((n,1))
     lonDistance = distance*math.sin(azimuth)  # n个偏移量[n]
+    lonDistance = lonDistance.reshape((n,1))
+    #print(math.sin(azimuth),distance,lonDistance)
     latDistance = distance*math.cos(azimuth)
+    latDistance = latDistance.reshape((n,1))
 
-    n = np.shape(shape)[0]
-    shadowShape = np.zeros((n, 5, 2))  # n个建筑物面，每个面都有5个点，每个点都有个维数
+    
+    shadowShape = np.zeros((n, 5, 2))  # n个建筑物面，每个面都有2个点，每个点都有个维数
 
     shadowShape[:, 0:2, :] += shape  # 前两个点不变
-    shadowShape[:, 2:3, 0] += shape + lonDistance
-    shadowShape[:, 2:3, 1] += shape + latDistance
+    #print(np.shape(shadowShape[:, 2:3, 0]),np.shape(shape[:, :, 0]),np.shape(lonDistance))
+    shadowShape[:, 2:4, 0] = shape[:, :, 0] + lonDistance
+    shadowShape[:, 2:4, 1] = shape[:, :, 1] + latDistance
     temp = shadowShape[:, 3, :]
     shadowShape[:, 3, :] = shadowShape[:, 2, :]
     shadowShape[:, 2, :] = temp
 
     shadowShape[:, 4, :] = shadowShape[:, 0, :]
+    time_end = time.time()  # 记录结束时间
+    time_sum = time_end - time_start  # 计算的时间差为程序的执行时间，单位为秒/s
+    print(time_sum)
 
     return shadowShape[:, 0:1, :]
 
@@ -248,10 +259,15 @@ def bdshadow_sunlight(buildings, date, height='height', ground=0, epsg=3857):
     building.crs = 'epsg:4326'
     building = building.to_crs(epsg=epsg)
     # obtain sun position
+    time_start = time.time()  # 记录开始时间
     sunPosition = get_position(date, lon, lat)
     buildingshadow = building.copy()
     buildingshadow['geometry'] = building.apply(
         lambda r: singlebdshadow_sunlight(r['geometry'], r[height], sunPosition), axis=1)
+    time_end = time.time()  # 记录结束时间
+    time_sum = time_end - time_start  # 计算的时间差为程序的执行时间，单位为秒/s
+    print(time_sum)
+
     # transform coordinate system back to wgs84
     shadows = buildingshadow.to_crs(epsg=4326)
     return shadows
