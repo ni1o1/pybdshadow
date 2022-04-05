@@ -1,8 +1,33 @@
-# -*- coding: utf-8 -*-
 """
-Created on Fri Apr  1 09:47:02 2022
+BSD 3-Clause License
 
-@author: acer
+Copyright (c) 2022, Qing Yu
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 import pandas as pd
 import geopandas as gpd
@@ -171,42 +196,70 @@ def calBdShadow(shape, shapeHeight, bdPosition, visualArea):
     return shadowVertex
 
 
-def singlebdshadow_sunlight(bd, height, sunPosition):
+def singlebdshadow_sunlight(building, height, sunPosition):
     '''
-    单个建筑物的计算，且要求是投影坐标系
-    输入建筑物Polygon与高度,时间
-    输出阴影Polygon
+    Calculate the sunlight shadow of a single building. The input data should be in
+    projection coordinate system
+
+
+    **Parameters**
+    building : shapely.geometry.Polygon
+        Building. coordinate system should be projection coordinate system
+    height : string
+        Building height
+    sunPosition : dict
+        Sun position calculated by suncalc
+
+    **Return**
+    shadow : shapely.geometry.Polygon
+        Building shadow geometry
     '''
-    wall = pd.DataFrame(list(bd.exterior.coords), columns=['x1', 'y1'])
+    wall = pd.DataFrame(list(building.exterior.coords), columns=['x1', 'y1'])
     wall['x2'] = wall['x1'].shift(-1)
     wall['y2'] = wall['y1'].shift(-1)
     wall['height'] = height
     wall = wall.iloc[:-1]
     wall['geometry'] = wall.apply(lambda r: Polygon(calSunShadow(
         [[r['x1'], r['y1']], [r['x2'], r['y2']]], r['height'], sunPosition)), axis=1)
-    shadow = gpd.GeoSeries(list(wall['geometry'])+[bd]).unary_union
+    shadow = gpd.GeoSeries(list(wall['geometry'])+[building]).unary_union
     return shadow
 
 
-def bdshadow_sunlight(buildings, date, height='height', epsg=3857):
+def bdshadow_sunlight(buildings, date, height='height', ground=0, epsg=3857):
     '''
-    全体建筑物的计算，输入是wgs84坐标系
-    输入建筑物GeoDataFrame,时间,高度字段
-    输出阴影GeoDataFrame
+    Calculate the sunlight shadow of the buildings.
+
+    **Parameters**
+    buildings : GeoDataFrame
+        Buildings. coordinate system should be WGS84
+    date : datetime
+        Datetime
+    height : string
+        Column name of building height
+    ground : number
+        Height of the ground
+    epsg : number
+        epsg code of the projection coordinate system
+
+    **Return**
+    shadows : GeoDataFrame
+        Building shadow
     '''
     building = buildings.copy()
-    # 给定经纬度
+    building[height] -= ground
+    building = building[building[height] > 0]
+    # calculate position
     lon1, lat1, lon2, lat2 = list(building.bounds.mean())
     lon = (lon1+lon2)/2
     lat = (lat1+lat2)/2
-    # 建筑转换坐标系
+    # transform coordinate system
     building.crs = 'epsg:4326'
     building = building.to_crs(epsg=epsg)
-    # 正午时间，获取太阳位置
+    # obtain sun position
     sunPosition = get_position(date, lon, lat)
     buildingshadow = building.copy()
     buildingshadow['geometry'] = building.apply(
         lambda r: singlebdshadow_sunlight(r['geometry'], r[height], sunPosition), axis=1)
-    # 转回wgs84坐标系
-    buildingshadow = buildingshadow.to_crs(epsg=4326)
-    return buildingshadow
+    # transform coordinate system back to wgs84
+    shadows = buildingshadow.to_crs(epsg=4326)
+    return shadows

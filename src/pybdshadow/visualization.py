@@ -1,7 +1,7 @@
-'''
+"""
 BSD 3-Clause License
 
-Copyright (c) 2021, Qing Yu
+Copyright (c) 2022, Qing Yu
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,31 +28,33 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-'''
+"""
 
 import pandas as pd
 import numpy as np
 import geopandas as gpd
 
 
-def show_bdshadow(building=gpd.GeoDataFrame(), shadow=gpd.GeoDataFrame(), height='height', zoom='auto'):
+def show_bdshadow(buildings=gpd.GeoDataFrame(), shadows=gpd.GeoDataFrame(), height='height', zoom='auto'):
     '''
-    用keplergl可视化建筑和阴影
+    Visualize the building and shadow with keplergl.
 
-    输入
-    building
+    **Parameters**
+    buildings : GeoDataFrame
+        Buildings. coordinate system should be WGS84
+    shadows : GeoDataFrame
+        Building shadows. coordinate system should be WGS84
+    height : string
+        Column name of building height
+    zoom : number
+        Zoom level of the map
 
-    shadow
-
-    height
-
-    zoom
-
-    输出
-    vmap
+    **Return**
+    vmap : keplergl.keplergl.KeplerGl
+        Visualizations provided by keplergl
     '''
-    displaybuilding = building.copy()
-    displaybuildingshadow = shadow.copy()
+    displaybuilding = buildings.copy()
+    displaybuildingshadow = shadows.copy()
     vmapdata = {}
     layers = []
     if len(displaybuilding) == 0:
