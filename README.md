@@ -35,7 +35,7 @@ Detail usage can be found in [this example](https://github.com/ni1o1/pybdshadow/
 
 It is recommended to use `Python 3.7, 3.8, 3.9`
 
-### Using pypi [![PyPI version](https://badge.fury.io/py/pybdshadow.svg)](https://badge.fury.io/py/pybdshadow)
+### Using pypi [![PyPI version](https://badge.fury.io/py/pybdshadow.svg)](https://badge.fury.io/py/pybdshadow) 
 
 `pybdshadow` can be installed by using `pip install`. Before installing `pybdshadow`, make sure that you have installed the available [geopandas package](https://geopandas.org/en/stable/getting_started/install.html). If you already have geopandas installed, run the following code directly from the command prompt to install `pybdshadow`:
 
