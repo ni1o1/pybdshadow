@@ -2,6 +2,7 @@ import pybdshadow
 import pandas as pd
 import numpy as np
 import geopandas as gpd
+from shapely.geometry import Polygon
 
 class Testpybdshadow:
     def test_bdshadow_sunlight(self):
