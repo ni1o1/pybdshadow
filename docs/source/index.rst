@@ -9,17 +9,41 @@ pybdshadow
 .. image:: _static/logo-wordmark-dark.png
 
 
-`pybdshadow` is a python package to generate building shadow geometry. 
+`pybdshadow` is a python package to calculate building shadow geometry from parallel light source (sunlight) or point light source (Advertisement). 
 
+
+
+Example
+---------------------------------
+
+Given a building GeoDataFrame and UTC datetime, `pybdshadow` can calculate the building shadow based on the sun position obtained by `suncalc`
+
+::
+
+   import pybdshadow
+   #Given UTC datetime
+   date = pd.to_datetime('2015-01-01 02:45:33.959797119')
+   #Calculate building shadow
+   shadows = pybdshadow.bdshadow_sunlight(buildings,date)
+
+`pybdshadow` also provide visualization method supported by keplergl. 
+
+::
+
+   # visualize buildings and shadows
+   pybdshadow.show_bdshadow(buildings = buildings,shadows = shadows)
+
+.. image:: _static/visualize.png
 
 Installation
 ---------------------------------
 
 
-It is recommended to use `Python 3.7, 3.8, 3.9`. 
-`pybdshadow` can be installed by using `pip install`. Before installing `pybdshadow`, make sure that 
-you have installed the available `geopandas` package: https://geopandas.org/en/stable/getting_started/install.html. 
-If you already have geopandas installed, run the following code directly from the command prompt to install `pybdshadow`:
+| It is recommended to use `Python 3.7, 3.8, 3.9`.   
+| `pybdshadow` can be installed by using `pip install`. Before installing `pybdshadow`, make sure that you have installed the available `geopandas` package: https://geopandas.org/en/stable/getting_started/install.html.   
+| If you already have geopandas installed, run the following code directly from the command prompt to install `pybdshadow`:
+
+::
 
     pip install pybdshadow
 
@@ -35,18 +59,6 @@ Dependency
 * `matplotlib`
 * `suncalc`
 * `keplergl` (optional)
-
-Example
----------------------------------
-
-Given a building GeoDataFrame and datetime, `pybdshadow` can calculate the building shadow based on the sun position obtained by `suncalc`
-
-::
-
-   #Given UTC datetime
-   date = pd.to_datetime('2015-01-01 02:45:33.959797119')
-   #Calculate building shadow
-   shadows = pybdshadow.bdshadow_sunlight(buildings,date)
 
 
 Citation information
