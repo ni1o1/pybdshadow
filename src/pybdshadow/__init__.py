@@ -41,11 +41,10 @@ __doc__ = """
 """
 
 from .pybdshadow import (
-    calSunShadow,
-    calBdShadow,
-    bdshadow
+    bdshadow_sunlight,
+    singlebdshadow_sunlight
 )
 from .visualization import (
-   show_bd,
+   show_bdshadow,
 )
-__all__ = ['calSunShadow','calBdShadow','bdshadow','show_bd']
+__all__ = ['bdshadow_sunlight','show_bdshadow','singlebdshadow_sunlight']
