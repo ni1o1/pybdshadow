@@ -151,19 +151,15 @@ def calSunShadow1(shape, shapeHeight, sunPosition):
     latDistance = distance*math.cos(azimuth)
     latDistance = latDistance.reshape((n,1))
 
-    
-    shadowShape = np.zeros((n, 5, 2))  # n个建筑物面，每个面都有2个点，每个点都有个维数
+    shadowShape = np.zeros((n, 5, 2))  # n个建筑物面，每个面都有5个点，每个点都有个维数
 
     shadowShape[:, 0:2, :] += shape  # 前两个点不变
     #print(np.shape(shadowShape[:, 2:3, 0]),np.shape(shape[:, :, 0]),np.shape(lonDistance))
     shadowShape[:, 2:4, 0] = shape[:, :, 0] + lonDistance
     shadowShape[:, 2:4, 1] = shape[:, :, 1] + latDistance
-    temp = shadowShape[:, 3, :]
-    shadowShape[:, 3, :] = shadowShape[:, 2, :]
-    shadowShape[:, 2, :] = temp
-
+    
+    shadowShape[:,[2,3],:] = shadowShape[:,[3,2],:]
     shadowShape[:, 4, :] = shadowShape[:, 0, :]
-
     return shadowShape
 
 
