@@ -27,7 +27,7 @@ class Testpybdshadow:
         buildings = pybdshadow.bd_preprocess(buildings)
 
         buildingshadow = pybdshadow.bdshadow_sunlight(
-            buildings, date, merge = True, epsg=3857)
+            buildings, date, merge = True)
 
         area = buildingshadow['geometry'].iloc[0]
         area = np.array(area.exterior.coords)
