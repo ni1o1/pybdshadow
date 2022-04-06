@@ -9,7 +9,7 @@ Building shadow
 Shadow from sunlight
 =============================
 
-.. function:: pybdshadow.bdshadow_sunlight(buildings, date, merge=False, height='height', ground=0, epsg=3857)
+.. function:: pybdshadow.bdshadow_sunlight(buildings, date, merge=False, height='height', ground=0)
 
 Calculate the sunlight shadow of the buildings.
 
@@ -25,8 +25,6 @@ height : string
     Column name of building height
 ground : number
     Height of the ground
-epsg : number
-    epsg code of the projection coordinate system
 
 **Return**
 
