@@ -32,110 +32,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import pandas as pd
 import geopandas as gpd
 from suncalc import get_position
-import shapely
 from shapely.geometry import Polygon
 import math
 import numpy as np
-import time
-# 读取shp格式的文件并保存
-
-# 计算空间直线与平面的交点
+from .preprocess import merge_shadow
 
 
-def calLinePlaneIntersect(line, plane):
-    p1 = line[0], p2 = line[1]
-    p1D = plane[0] * p1[0] + plane[1] * p1[1] + plane[2] * p1[2] + plane[3]
-    p1D2 = plane[0] * (p2[0] - p1[0]) + plane[1] * \
-        (p2[1] - p1[1]) + plane[2] * (p2[2] - p1[2])
-    m = abs(p1D / p1D2)
-
-    #p2D = (plane[0] * p2[0] + plane[1] * p2[1] + plane[2] * p2[2] + plane[3])
-    x = p1[0] - m * (p2[0] - p1[0])
-    y = p1[1] - m * (p2[1] - p1[1])
-    z = p1[2] - m * (p2[2] - p1[2])
-
-    # if (isNaN(z)):
-    # return null
-
-    return [x, y, z]
-
-
-def radianToAngle(radian):
-    radian = radian*180/math.pi
-    # if radian<0:
-    #   radian += 360
-    return radian
-
-
-def angleToRadian(angle):
-    angle = angle/180*math.pi
-    # if radian<0:
-    #   radian += 360
-    return angle
-
-
-def lineCrossMultiply(l1, l2, option="lineSegment"):
-    if (option == "lineSegment"):
-        # 根据两直线计算：前-后
-        vectorL1 = [l1[0][0] - l1[1][0], l1[0]
-                    [1] - l1[1][1], l1[0][2] - l1[1][2]]
-        vectorL2 = [l2[0][0] - l2[1][0], l2[0]
-                    [1] - l2[1][1], l2[0][2] - l2[1][2]]
-
-        # 计算叉乘
-        A = vectorL1[1] * vectorL2[2] - vectorL2[1] * vectorL1[2]
-        B = vectorL2[0] * vectorL1[2] - vectorL1[0] * vectorL2[2]
-        C = vectorL1[0] * vectorL2[1] - vectorL2[0] * vectorL1[1]
-
-    elif (option == "vector"):
-        A = l1[1] * l2[2] - l2[1] * l1[2]
-        B = l2[0] * l1[2] - l1[0] * l2[2]
-        C = l1[0] * l2[1] - l2[0] * l1[1]
-
-    return [A, B, C, A + B + C]
-
-
-def calPlaneByTwoVectors(n1, n2, p):
-    n = lineCrossMultiply(n1, n2, "vector")
-    n.splice(3, 1)
-    D = -n[0] * p[0] - n[1] * p[1] - n[2] * p[2]
-    n.push(D)
-    return n
-
-
-# 计算每个面的阴影
-# shape的格式：两个平面点组成的列表
-def calSunShadow(shape, shapeHeight, sunPosition):
-    azimuth = (sunPosition['azimuth'])
-    altitude = (sunPosition['altitude'])
-
-    distance = shapeHeight/math.tan(altitude)
-
-    # 计算投影位置偏移
-    lonDistance = distance*math.sin(azimuth)
-    latDistance = distance*math.cos(azimuth)
-
-    shadowShape = []
-    for i in range(0, 2):
-        vertex = shape[i]
-        # vertex.append(0)
-        shadowShape.append(vertex)
-
-    for i in range(2, 4):  # 计算建筑物的顶部点投影位置
-        vertex = shape[3-i]
-        shadowVertexLon = vertex[0] + lonDistance  # 经度
-        shadowVertexLat = vertex[1] + latDistance  # 纬度
-        shadowShape.append([shadowVertexLon, shadowVertexLat])
-    vertex = shadowShape[0]
-    shadowShape.append(vertex)
-
-    return shadowShape
-
-
-# 多维数据类型：numpy
-# 输入的shape是一个矩阵（n*2*2) n个建筑物面，每个建筑有2个点，每个点有三个维度
-# shapeHeight(n) 每一栋建筑的高度都是一样的
-def calSunShadow1(shape, shapeHeight, sunPosition):
+def calSunShadow_vector(shape, shapeHeight, sunPosition):
+    # 多维数据类型：numpy
+    # 输入的shape是一个矩阵（n*2*2) n个建筑物面，每个建筑有2个点，每个点有三个维度
+    # shapeHeight(n) 每一栋建筑的高度都是一样的
     azimuth = (sunPosition['azimuth'])
     altitude = (sunPosition['altitude'])
 
@@ -143,84 +49,24 @@ def calSunShadow1(shape, shapeHeight, sunPosition):
     distance = shapeHeight/math.tan(altitude)
 
     # 计算投影位置偏移
-    
-    #lonDistance = np.zeros((n,1))
+
     lonDistance = distance*math.sin(azimuth)  # n个偏移量[n]
-    lonDistance = lonDistance.reshape((n,1))
-    #print(math.sin(azimuth),distance,lonDistance)
+    lonDistance = lonDistance.reshape((n, 1))
     latDistance = distance*math.cos(azimuth)
-    latDistance = latDistance.reshape((n,1))
+    latDistance = latDistance.reshape((n, 1))
 
     shadowShape = np.zeros((n, 5, 2))  # n个建筑物面，每个面都有5个点，每个点都有个维数
 
     shadowShape[:, 0:2, :] += shape  # 前两个点不变
-    #print(np.shape(shadowShape[:, 2:3, 0]),np.shape(shape[:, :, 0]),np.shape(lonDistance))
     shadowShape[:, 2:4, 0] = shape[:, :, 0] + lonDistance
     shadowShape[:, 2:4, 1] = shape[:, :, 1] + latDistance
-    
-    shadowShape[:,[2,3],:] = shadowShape[:,[3,2],:]
+
+    shadowShape[:, [2, 3], :] = shadowShape[:, [3, 2], :]
     shadowShape[:, 4, :] = shadowShape[:, 0, :]
     return shadowShape
 
 
-# 计算广告牌每个面的阴影
-def calBdShadow(shape, shapeHeight, bdPosition, visualArea):
-
-    visualGroundR = visualArea['visualGroundR']
-    bdHeight = bdPosition[2]
-    groundPlane = [0, 0, 1, 0]
-    shadowShape = []
-    for i in range(0, 2):
-        vertex = shape[i]
-        # vertex.append(0)
-        shadowShape.append(vertex)
-
-    for i in range(2, 3):  # 计算建筑物的顶部点投影位置
-
-        # 如果太阳高度比较高
-        if bdHeight < shapeHeight:
-            bdHeight = shapeHeight+0.1
-        vertex = shape[i]
-        vertex.append(shapeHeight)
-        shadowVertex = calLinePlaneIntersect(
-            [bdHeight, shape[i]], groundPlane)  # 计算投影点
-        shadowShape.append(shadowVertex[0:1])
-    vertex = shadowShape[0]
-    shadowShape.append(vertex)
-
-    return shadowVertex
-
-
-def singlebdshadow_sunlight(building, height, sunPosition):
-    '''
-    Calculate the sunlight shadow of a single building. The input data should be in
-    projection coordinate system
-
-
-    **Parameters**
-    building : shapely.geometry.Polygon
-        Building. coordinate system should be projection coordinate system
-    height : string
-        Building height
-    sunPosition : dict
-        Sun position calculated by suncalc
-
-    **Return**
-    shadow : shapely.geometry.Polygon
-        Building shadow geometry
-    '''
-    wall = pd.DataFrame(list(building.exterior.coords), columns=['x1', 'y1'])
-    wall['x2'] = wall['x1'].shift(-1)
-    wall['y2'] = wall['y1'].shift(-1)
-    wall['height'] = height
-    wall = wall.iloc[:-1]
-    wall['geometry'] = wall.apply(lambda r: Polygon(calSunShadow(
-        [[r['x1'], r['y1']], [r['x2'], r['y2']]], r['height'], sunPosition)), axis=1)
-    shadow = gpd.GeoSeries(list(wall['geometry'])+[building]).unary_union
-    return shadow
-
-
-def bdshadow_sunlight(buildings, date, height='height', ground=0, epsg=3857):
+def bdshadow_sunlight(buildings, date, merge=False, height='height', ground=0, epsg=3857):
     '''
     Calculate the sunlight shadow of the buildings.
 
@@ -229,6 +75,8 @@ def bdshadow_sunlight(buildings, date, height='height', ground=0, epsg=3857):
         Buildings. coordinate system should be WGS84
     date : datetime
         Datetime
+    merge : bool
+        whether to merge the wall shadows into the building shadows
     height : string
         Column name of building height
     ground : number
@@ -250,54 +98,41 @@ def bdshadow_sunlight(buildings, date, height='height', ground=0, epsg=3857):
     # transform coordinate system
     building.crs = 'epsg:4326'
     building = building.to_crs(epsg=epsg)
+
     # obtain sun position
-    time_start = time.time()  # 记录开始时间
     sunPosition = get_position(date, lon, lat)
     buildingshadow = building.copy()
-    buildingshadow['geometry'] = building.apply(
-        lambda r: singlebdshadow_sunlight(r['geometry'], r[height], sunPosition), axis=1)
-    time_end = time.time()  # 记录结束时间
-    time_sum = time_end - time_start  # 计算的时间差为程序的执行时间，单位为秒/s
-    print(time_sum)
+    # walls
+    a = buildingshadow['geometry'].apply(lambda r: list(r.exterior.coords))
+    buildingshadow['wall'] = a
+    buildingshadow = buildingshadow.set_index(['building_id'])
+    a = buildingshadow.apply(lambda x: pd.Series(x['wall']), axis=1).unstack()
+    walls = a[- a.isnull()].reset_index().sort_values(by=['building_id', 'level_0'])
+    walls = pd.merge(walls, buildingshadow['height'].reset_index())
+    walls['x1'] = walls[0].apply(lambda r: r[0])
+    walls['y1'] = walls[0].apply(lambda r: r[1])
+    walls['x2'] = walls['x1'].shift(-1)
+    walls['y2'] = walls['y1'].shift(-1)
+    walls = walls[walls['building_id'] == walls['building_id'].shift(-1)]
+    walls = walls[['x1', 'y1', 'x2', 'y2', 'building_id', 'height']]
+    walls['wall'] = walls.apply(lambda r: [[r['x1'], r['y1']],
+                                           [r['x2'], r['y2']]], axis=1)
+    walls_shape = np.array(list(walls['wall']))
+    # calculate shadow for walls
+    shadowShape = calSunShadow_vector(
+        walls_shape, walls['height'].values, sunPosition)
+    walls['geometry'] = list(shadowShape)
+    walls['geometry'] = walls['geometry'].apply(lambda r: Polygon(r))
+    walls = gpd.GeoDataFrame(walls)
 
-    # transform coordinate system back to wgs84
-    shadows = buildingshadow.to_crs(epsg=4326)
+    walls.crs = 'epsg:'+str(epsg)
+    shadows = walls[['building_id', 'geometry']].to_crs(epsg=4326)
+    if merge:
+        shadows = merge_shadow(shadows)
     return shadows
 
-
-def bd_preprocess(buildings):
-    '''
-    Preprocess building data, so that we can perform shadow calculation.
-    Remove empty polygons and convert multipolygons into polygons.
-
-    **Parameters**
-    buildings : GeoDataFrame
-        Buildings. 
-
-    **Return**
-    allbds : GeoDataFrame
-        Polygon buildings
-    '''
-    buildings = buildings[buildings.is_valid]
-    polygon_buildings = buildings[buildings['geometry'].apply(
-        lambda r:type(r) == shapely.geometry.polygon.Polygon)]
-    multipolygon_buildings = buildings[buildings['geometry'].apply(
-        lambda r:type(r) == shapely.geometry.multipolygon.MultiPolygon)]
-    allbds = []
-    for j in range(len(multipolygon_buildings)):
-        r = multipolygon_buildings.iloc[j]
-        singlebd = gpd.GeoDataFrame()
-        singlebd['geometry'] = list(r['geometry'].geoms)
-        for i in r.index:
-            if i != 'geometry':
-                singlebd[i] = r[i]
-        allbds.append(singlebd)
-    allbds.append(polygon_buildings)
-    allbds = pd.concat(allbds)
-    return allbds
 
 '''
 待开发功能:
 1. 广告阴影计算
-2. 太阳阴影的向量计算
 '''
