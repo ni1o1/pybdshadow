@@ -139,6 +139,7 @@ def bdshadow_sunlight(buildings, date, merge=True, height='height', ground=0):
     '''
 
     building = buildings.copy()
+
     building[height] -= ground
     building = building[building[height] > 0]
 
