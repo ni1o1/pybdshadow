@@ -58,3 +58,7 @@ pip install pybdshadow
 ## Citation information
 
 Citation information can be found at [CITATION.cff](https://github.com/ni1o1/pybdshadow/blob/main/CITATION.cff).
+
+## Contributing to pybdshadow [![GitHub contributors](https://img.shields.io/github/contributors/ni1o1/pybdshadow.svg)](https://github.com/ni1o1/pybdshadow/graphs/contributors) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/ni1o1/pybdshadow)
+
+All contributions, bug reports, bug fixes, documentation improvements, enhancements and ideas are welcome. A detailed overview on how to contribute can be found in the [contributing guide](https://github.com/ni1o1/pybdshadow/blob/master/CONTRIBUTING.md) on GitHub.
