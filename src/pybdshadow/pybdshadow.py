@@ -35,7 +35,7 @@ from suncalc import get_position
 from shapely.geometry import Polygon
 import math
 import numpy as np
-from .preprocess import merge_shadow
+from .preprocess import merge_shadow,bd_preprocess
 
 
 def lonlat_mercator(lonlat):
@@ -117,7 +117,7 @@ def calSunShadow_vector(shape, shapeHeight, sunPosition):
 # def mLonlat():
 
 
-def bdshadow_sunlight(buildings, date, merge=False, height='height', ground=0):
+def bdshadow_sunlight(buildings, date, merge=True, height='height', ground=0):
     '''
     Calculate the sunlight shadow of the buildings.
 
@@ -139,7 +139,6 @@ def bdshadow_sunlight(buildings, date, merge=False, height='height', ground=0):
     '''
 
     building = buildings.copy()
-
     building[height] -= ground
     building = building[building[height] > 0]
 
@@ -181,10 +180,10 @@ def bdshadow_sunlight(buildings, date, merge=False, height='height', ground=0):
     walls['geometry'] = list(shadowShape)
     walls['geometry'] = walls['geometry'].apply(lambda r: Polygon(r))
     walls = gpd.GeoDataFrame(walls)
-
+    walls = pd.concat([walls,building])
     if merge:
         walls = merge_shadow(walls)
-
+        
     return walls
 
 

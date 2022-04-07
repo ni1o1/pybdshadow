@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import shapely
 import pandas as pd
 import geopandas as gpd
+from shapely.geometry import MultiPolygon
 
 def bd_preprocess(buildings):
     '''
@@ -83,12 +84,6 @@ def merge_shadow(data, col = 'building_id'):
     data1 : GeoDataFrame
         The merged polygon
     '''
-    groupnames = []
-    geometries = []
-    for i in data[col].drop_duplicates():
-        groupnames.append(i)
-        geometries.append(data[data[col] == i].unary_union)
-    data1 = gpd.GeoDataFrame()
-    data1['geometry'] = geometries
-    data1[col] = groupnames
+    
+    data1 = data.groupby([col])['geometry'].apply(lambda df:MultiPolygon(list(df)).buffer(0)).reset_index()
     return data1
