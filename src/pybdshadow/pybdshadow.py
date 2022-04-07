@@ -40,7 +40,7 @@ from .preprocess import merge_shadow,bd_preprocess
 
 
 def lonlat_mercator(lonlat):
-    mercator = lonlat[:]
+    mercator = lonlat.copy()  
     earthRad = 6378137.0
     mercator[0] = lonlat[0] * math.pi / 180 * earthRad  # 角度转弧度
     a = lonlat[1] * math.pi / 180  # 弧度制纬度
@@ -62,7 +62,7 @@ def lonlat_mercator_vector(lonlat):
 
 
 def mercator_lonlat(mercator):
-    lonlat = mercator[:]
+    lonlat = mercator.copy()
     lonlat[0] = mercator[0]/20037508.34*180
     lonlat[1] = mercator[1]/20037508.34*180
     lonlat[1] = 180/math.pi * \
@@ -321,7 +321,9 @@ def calOrientation(p1,p2):
 
 def initialVisualRange(brandCenter, orientation, xResolution = 0.01, isAngle = True,eyeResolution = 3):
     #广告牌的位置，面向的角度，
+    print(brandCenter)
     brandCenterM = lonlat_mercator(brandCenter)
+    print(brandCenter,brandCenterM)
     
     if isAngle == True:
         eyeResolution = (eyeResolution / 60) / 60
@@ -335,7 +337,7 @@ def initialVisualRange(brandCenter, orientation, xResolution = 0.01, isAngle = T
     else:
         visualGroundR = 0;
     
-    visualCenter = [brandCenter[0] + brandCenter[0] * math.cos(orientation),brandCenter[1] + brandCenter[1] * math.cos(orientation)]
+    visualCenter = [brandCenterM[0] + visualR * math.cos(orientation),brandCenterM[1] + visualR * math.sin(orientation)]
     visualCenter = mercator_lonlat(visualCenter)
 
     visualArea = {
