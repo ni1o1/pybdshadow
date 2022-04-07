@@ -18,13 +18,13 @@ changes to the codebase.
 4. Before submitting your changes for review, make sure to check that your changes do not break any tests by running: ``pytest``. The tests are located in the [tests](https://github.com/ni1o1/pybdshadow/tree/main/src/pybdshadow/tests) folder.
 5. When you are ready to submit your contribution, raise the Pull Request(PR). Once you finished your PR, the github [testing workflow](https://github.com/ni1o1/pybdshadow/actions/workflows/tests.yml) will test your code. We will review your changes, and might ask you to make additional changes before it is finally ready to merge. However, once it's ready, we will merge it, and you will have successfully contributed to the codebase!
 
-# 为Pybdshadow贡献代码
+# 为pybdshadow项目贡献代码
 
 无论您是新手还是经验丰富的软件开发人员，欢迎您提供所有意见和建议！
 
 ## 开始
 
-如果你想为*Pybdshadow*代码库做贡献，最好从[GitHub issues](https://github.com/ni1o1/pybdshadow/issues)开始。你可以在这里提交BUG报告，并提出改进代码和文档的方法和建议。
+如果你想为*pybdshadow*代码库做贡献，最好从[GitHub issues](https://github.com/ni1o1/pybdshadow/issues)开始。你可以在这里提交BUG报告，并提出改进代码和文档的方法和建议。
 
 ## 如何贡献代码
 
