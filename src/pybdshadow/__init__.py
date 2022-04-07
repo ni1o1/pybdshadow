@@ -42,7 +42,9 @@ __doc__ = """
 
 from .pybdshadow import (
     bdshadow_sunlight,
-    bdshadow_pointlight
+    bdshadow_pointlight,
+    calOrientation,
+    initialVisualRange
 )
 from .preprocess import (
     bd_preprocess,

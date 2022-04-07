@@ -250,13 +250,15 @@ def calPointLightShadow_vector(shape,shapeHeight,pointLight):
 
     return shadowShape
 
-def bdshadow_pointlight(buildings, merge=True, height='height', ground=0):
+def bdshadow_pointlight(buildings,pointlon,pointlat,pointheight, merge=True, height='height', ground=0):
     '''
     Calculate the sunlight shadow of the buildings.
 
     **Parameters**
     buildings : GeoDataFrame
         Buildings. coordinate system should be WGS84
+    pointlon,pointlat,pointheight : float
+        Point light coordinates and height
     date : datetime
         Datetime
     merge : bool
@@ -276,14 +278,8 @@ def bdshadow_pointlight(buildings, merge=True, height='height', ground=0):
     building[height] -= ground
     building = building[building[height] > 0]
 
-    # calculate position
-    lon1, lat1, lon2, lat2 = list(building.bounds.mean())
-    lon = (lon1+lon2)/2
-    lat = (lat1+lat2)/2
-
-    # obtain sun position
+    # building to walls
     buildingshadow = building.copy()
-
     a = buildingshadow['geometry'].apply(lambda r: list(r.exterior.coords))
     buildingshadow['wall'] = a
     buildingshadow = buildingshadow.set_index(['building_id'])
@@ -301,7 +297,7 @@ def bdshadow_pointlight(buildings, merge=True, height='height', ground=0):
     walls_shape = np.array(list(walls['wall']))
     
     #在这里创建点光源
-    pointLightPosition = {'position':[lon,lat,50],'angle':30}
+    pointLightPosition = {'position':[pointlon,pointlat,pointheight]}
     # calculate shadow for walls
     shadowShape = calPointLightShadow_vector(
         walls_shape, walls['height'].values, pointLightPosition)
@@ -323,13 +319,13 @@ def calOrientation(p1,p2):
         orientation += math.pi/2
     return orientation
 
-def initialVisualRange(brandCenter, orientation, xResolution = 0.01, isAngle = true,eyeResolution = 3):
+def initialVisualRange(brandCenter, orientation, xResolution = 0.01, isAngle = True,eyeResolution = 3):
     #广告牌的位置，面向的角度，
     brandCenterM = lonlat_mercator(brandCenter)
     
-    if isAngle == true:
+    if isAngle == True:
         eyeResolution = (eyeResolution / 60) / 60
-        eyeResolution = (eyeResolution * Math.PI) / 180 #人眼分辨率，弧度
+        eyeResolution = (eyeResolution * math.pi) / 180 #人眼分辨率，弧度
     
     D = xResolution / eyeResolution
     #半径
