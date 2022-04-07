@@ -41,7 +41,8 @@ __doc__ = """
 """
 
 from .pybdshadow import (
-    bdshadow_sunlight
+    bdshadow_sunlight,
+    bdshadow_pointlight
 )
 from .preprocess import (
     bd_preprocess,

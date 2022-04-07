@@ -35,11 +35,12 @@ from suncalc import get_position
 from shapely.geometry import Polygon
 import math
 import numpy as np
+import time
 from .preprocess import merge_shadow,bd_preprocess
 
 
 def lonlat_mercator(lonlat):
-    mercator = [0, 0]
+    mercator = lonlat[:]
     earthRad = 6378137.0
     mercator[0] = lonlat[0] * math.pi / 180 * earthRad  # 角度转弧度
     a = lonlat[1] * math.pi / 180  # 弧度制纬度
@@ -61,11 +62,11 @@ def lonlat_mercator_vector(lonlat):
 
 
 def mercator_lonlat(mercator):
-    lonlat = [0, 0]
+    lonlat = mercator[:]
     lonlat[0] = mercator[0]/20037508.34*180
     lonlat[1] = mercator[1]/20037508.34*180
     lonlat[1] = 180/math.pi * \
-        (2*math.atan(math.exp(lonlat[1]*math.pi/180))-math.pi/2)
+        (2*math.atan(math.exp(lonlat[1]*math.pi/180)) - math.pi/2)
 
     return lonlat
 
@@ -75,7 +76,7 @@ def mercator_lonlat_vector(mercator):
     lonlat[:, :, 0] = mercator[:, :, 0]/20037508.34*180
     lonlat[:, :, 1] = mercator[:, :, 1]/20037508.34*180
     lonlat[:, :, 1] = 180/math.pi * \
-        (2*np.arctan(np.exp(lonlat[:, :, 1]*math.pi/180))-math.pi/2)
+        (2*np.arctan(np.exp(lonlat[:, :, 1]*math.pi/180)) - math.pi/2)
 
     return lonlat
 
@@ -192,3 +193,160 @@ def bdshadow_sunlight(buildings, date, merge=True, height='height', ground=0):
 待开发功能:
 1. 广告阴影计算
 '''
+#用xyz表示，方向
+def calPointLightShadow(shape,shapeHeight,pointLight):
+    #数据类型：numpy
+
+    pointLightPosition = pointLight['position']
+    #pointLightAngle = pointLight['angle']
+    if pointLightPosition[2]<shapeHeight:
+        pointLightPosition = shapeHeight + 0.001
+    #高度比
+    scale = shapeHeight/(pointLightPosition - shapeHeight)
+    
+    shadowShape = [] #list
+    for i in range(0,2):
+        vertex = shape[i]
+        shadowShape.append(vertex)
+    
+    for i in range(2,3):    #计算建筑物的顶部点投影位置
+        
+        vertex = shape[3 - i]#lon lat
+        vertexToLightVector = vertex - pointLightPosition[0:1]
+        
+        shadowVertex = vertex + vertexToLightVector*scale
+        shadowShape.append(shadowVertex)
+    vertex = shadowShape[0]
+    shadowShape.append(vertex)
+
+    return shadowShape
+
+
+#用xyz表示，方向,numpy格式
+def calPointLightShadow_vector(shape,shapeHeight,pointLight):
+    # 多维数据类型：numpy
+    # 输入的shape是一个矩阵（n*2*2) n个建筑物面，每个建筑有2个点，每个点有三个维度
+    # shapeHeight(n) 每一栋建筑的高度都是一样的
+    n = np.shape(shape)[0]
+    pointLightPosition = pointLight['position']#[lon,lat,height]
+    
+    #高度比
+    #scale[scale<=0] =1000
+    diff = pointLightPosition[2] - shapeHeight
+    scale = np.zeros(n)
+    scale[diff!=0] = shapeHeight[diff!=0]/(diff[diff!=0])
+    scale[scale <= 0] = 10#n
+    scale = scale.reshape((n, 1))
+
+    shadowShape = np.zeros((n, 5, 2))
+    
+    shadowShape[:, 0:2, :] += shape  # 前两个点不变
+    vertexToLightVector = shape - pointLightPosition[0:2]#n,2,2
+         
+    shadowShape[:, 2, :] = shape[:,1,:] + vertexToLightVector[:,1,:]*scale#[n,2,2] = [n,2,2]+[n,2,2]*n
+    shadowShape[:, 3, :] = shape[:,0,:] + vertexToLightVector[:,0,:]*scale
+
+    shadowShape[:, 4, :] = shadowShape[:, 0, :]
+
+    return shadowShape
+
+def bdshadow_pointlight(buildings, merge=True, height='height', ground=0):
+    '''
+    Calculate the sunlight shadow of the buildings.
+
+    **Parameters**
+    buildings : GeoDataFrame
+        Buildings. coordinate system should be WGS84
+    date : datetime
+        Datetime
+    merge : bool
+        whether to merge the wall shadows into the building shadows
+    height : string
+        Column name of building height
+    ground : number
+        Height of the ground
+
+    **Return**
+    shadows : GeoDataFrame
+        Building shadow
+    '''
+
+    building = buildings.copy()
+
+    building[height] -= ground
+    building = building[building[height] > 0]
+
+    # calculate position
+    lon1, lat1, lon2, lat2 = list(building.bounds.mean())
+    lon = (lon1+lon2)/2
+    lat = (lat1+lat2)/2
+
+    # obtain sun position
+    buildingshadow = building.copy()
+
+    a = buildingshadow['geometry'].apply(lambda r: list(r.exterior.coords))
+    buildingshadow['wall'] = a
+    buildingshadow = buildingshadow.set_index(['building_id'])
+    a = buildingshadow.apply(lambda x: pd.Series(x['wall']), axis=1).unstack()
+    walls = a[- a.isnull()].reset_index().sort_values(by=['building_id', 'level_0'])
+    walls = pd.merge(walls, buildingshadow['height'].reset_index())
+    walls['x1'] = walls[0].apply(lambda r: r[0])
+    walls['y1'] = walls[0].apply(lambda r: r[1])
+    walls['x2'] = walls['x1'].shift(-1)
+    walls['y2'] = walls['y1'].shift(-1)
+    walls = walls[walls['building_id'] == walls['building_id'].shift(-1)]
+    walls = walls[['x1', 'y1', 'x2', 'y2', 'building_id', 'height']]
+    walls['wall'] = walls.apply(lambda r: [[r['x1'], r['y1']],
+                                           [r['x2'], r['y2']]], axis=1)
+    walls_shape = np.array(list(walls['wall']))
+    
+    #在这里创建点光源
+    pointLightPosition = {'position':[lon,lat,50],'angle':30}
+    # calculate shadow for walls
+    shadowShape = calPointLightShadow_vector(
+        walls_shape, walls['height'].values, pointLightPosition)
+
+    walls['geometry'] = list(shadowShape)
+    walls['geometry'] = walls['geometry'].apply(lambda r: Polygon(r))
+    walls = gpd.GeoDataFrame(walls)
+    walls = pd.concat([walls,building])
+    if merge:
+        walls = merge_shadow(walls)
+        
+    return walls
+
+def calOrientation(p1,p2):
+    k = (p2[1]-p1[1])/(p2[0]-p1[0])
+    k = -1/k
+    orientation = math.tan(k)
+    if orientation <0:
+        orientation += math.pi/2
+    return orientation
+
+def initialVisualRange(brandCenter, orientation, xResolution = 0.01, isAngle = true,eyeResolution = 3):
+    #广告牌的位置，面向的角度，
+    brandCenterM = lonlat_mercator(brandCenter)
+    
+    if isAngle == true:
+        eyeResolution = (eyeResolution / 60) / 60
+        eyeResolution = (eyeResolution * Math.PI) / 180 #人眼分辨率，弧度
+    
+    D = xResolution / eyeResolution
+    #半径
+    visualR = D / 2  #单位m
+    if visualR > brandCenter[2]:
+        visualGroundR = math.sqrt((math.pow(D, 2)) / 4 - (math.pow(brandCenterM[2], 2))) #地面上的可视化半径
+    else:
+        visualGroundR = 0;
+    
+    visualCenter = [brandCenter[0] + brandCenter[0] * math.cos(orientation),brandCenter[1] + brandCenter[1] * math.cos(orientation)]
+    visualCenter = mercator_lonlat(visualCenter)
+
+    visualArea = {
+        'brandCenter': brandCenter,
+        'visualR': visualR,
+        'visualGroundR': visualGroundR,
+        'visualCenter': visualCenter,
+    }
+    return visualArea
+
