@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import pandas as pd
 import geopandas as gpd
 from suncalc import get_position
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon,Point
 import math
 import numpy as np
 import time
@@ -338,6 +338,12 @@ def initialVisualRange(brandCenter, orientation, xResolution = 0.01, isAngle = T
         visualGroundR = 0;
     
     visualCenter = [brandCenterM[0] + visualR * math.cos(orientation),brandCenterM[1] + visualR * math.sin(orientation)]
+    
+    #生成可视区域面，原理就是对中心点取buffer构成圆
+    visualArea_circle = Point(visualCenter).buffer(visualGroundR)
+    #再转为经纬度坐标系
+    visualArea_circle = Polygon(mercator_lonlat_vector(np.array([visualArea_circle.exterior.coords]))[0])
+    
     visualCenter = mercator_lonlat(visualCenter)
 
     visualArea = {
@@ -346,5 +352,5 @@ def initialVisualRange(brandCenter, orientation, xResolution = 0.01, isAngle = T
         'visualGroundR': visualGroundR,
         'visualCenter': visualCenter,
     }
-    return visualArea
+    return visualArea,visualArea_circle
 
