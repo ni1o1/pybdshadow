@@ -43,8 +43,7 @@ __doc__ = """
 from .pybdshadow import (
     bdshadow_sunlight,
     bdshadow_pointlight,
-    calOrientation,
-    initialVisualRange
+    ad_visualArea
 )
 from .preprocess import (
     bd_preprocess,
@@ -52,6 +51,7 @@ from .preprocess import (
 )
 from .visualization import (
     show_bdshadow,
+    ad_to_gdf
 )
 __all__ = ['bdshadow_sunlight',
            'show_bdshadow',

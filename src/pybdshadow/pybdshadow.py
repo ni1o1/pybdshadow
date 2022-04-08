@@ -354,3 +354,47 @@ def initialVisualRange(brandCenter, orientation, xResolution = 0.01, isAngle = T
     }
     return visualArea,visualArea_circle
 
+def ad_visualArea(ad_params,buildings=gpd.GeoDataFrame(),height = 'height'):
+    '''
+    Calculate visualArea for advertisement.
+
+    **Parameters**
+    ad_params : dict
+        Parameters of advertisement.
+    buildings : GeoDataFrame
+        Buildings. coordinate system should be WGS84
+    height : string
+        Column name of building height
+
+    **Return**
+    visualArea : GeoDataFrame
+        Visual Area of the advertisement
+    shadows : GeoDataFrame
+        Building shadows
+    '''
+    if len(buildings) == 0:
+        buildings['geometry'] = []
+        buildings[height] = []
+
+    if 'orientation' not in ad_params:
+        ad_params['orientation'] = calOrientation(ad_params['point1']+[ad_params['height']],ad_params['point2']+[ad_params['height']])
+    if 'brandCenter' not in ad_params:
+        ad_params['brandCenter'] = list((np.array(ad_params['point1'])+np.array(ad_params['point2']))/2)
+
+    #calculate initial visualRange
+    brandCenter = ad_params['brandCenter']
+    _,visualArea_circle = initialVisualRange(ad_params['brandCenter']+[ad_params['height']],ad_params['orientation'])
+    visualArea_circle = gpd.GeoDataFrame({'geometry': [visualArea_circle]})
+    visualArea_circle.crs = buildings.crs
+    
+    #filter buildings inside visualRange
+    ad_buildings = gpd.sjoin(buildings,visualArea_circle)
+
+    #calculate building shadow
+    shadows = bdshadow_pointlight(ad_buildings,brandCenter[0],brandCenter[1],ad_params['height'])
+
+    #calculate visual area
+    shadows.crs = visualArea_circle.crs
+    visualArea = visualArea_circle.difference(gpd.clip(visualArea_circle,shadows))
+    visualArea = gpd.GeoDataFrame(visualArea,columns=['geometry'])
+    return visualArea,shadows
