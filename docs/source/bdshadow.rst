@@ -39,6 +39,7 @@ Shadow from pointlight
 Calculate the sunlight shadow of the buildings.
 
 **Parameters**
+
 buildings : GeoDataFrame
     Buildings. coordinate system should be WGS84
 pointlon,pointlat,pointheight : float
@@ -53,5 +54,6 @@ ground : number
     Height of the ground
 
 **Return**
+
 shadows : GeoDataFrame
     Building shadow

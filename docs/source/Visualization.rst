@@ -22,6 +22,7 @@ Visualization
 Visualize the building and shadow with keplergl.
 
 **Parameters**
+
 buildings : GeoDataFrame
     Buildings. coordinate system should be WGS84
 shadows : GeoDataFrame
@@ -36,6 +37,7 @@ zoom : number
     Zoom level of the map
 
 **Return**
+
 vmap : keplergl.keplergl.KeplerGl
     Visualizations provided by keplergl
 

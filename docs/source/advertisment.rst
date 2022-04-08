@@ -27,12 +27,14 @@ You can use `ad_to_gdf` to generate the GeoDataFrame for the billboard in order 
 Generate a GeoDataFrame from ad_params for visualization.
 
 **Parameters**
+
 ad_params : dict
     Parameters of advertisement.
 billboard_height : number
     The height of the billboard
 
 **Return**
+
 ad_gdf : GeoDataFrame
     advertisment GeoDataFrame
 
@@ -44,6 +46,7 @@ visual area calculation
 Calculate visual area for advertisement.
 
 **Parameters**
+
 ad_params : dict
     Parameters of advertisement.
 buildings : GeoDataFrame
@@ -52,6 +55,7 @@ height : string
     Column name of building height
 
 **Return**
+
 visualArea : GeoDataFrame
     Visual Area of the advertisement
 shadows : GeoDataFrame

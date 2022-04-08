@@ -44,7 +44,7 @@ shadows = pybdshadow.bdshadow_pointlight(buildings,139.713319,35.552040,200)
 pybdshadow.show_bdshadow(buildings = buildings,shadows = shadows)
 ```
 
-![1649405838683.png](image/README/1649405838683.png)
+![1649405838683.png](https://github.com/ni1o1/pybdshadow/raw/main/image/README/1649405838683.png)
 
 ### Billboard visual area analyze
 
@@ -81,7 +81,7 @@ pybdshadow.show_bdshadow(buildings=buildings,
                          ad_visualArea=visualArea)
 ```
 
-![1649406044109.png](image/README/1649406044109.png)
+![1649406044109.png](https://github.com/ni1o1/pybdshadow/raw/main/image/README/1649406044109.png)
 
 ## Installation
 
