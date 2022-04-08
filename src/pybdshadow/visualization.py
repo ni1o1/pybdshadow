@@ -32,10 +32,65 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import numpy as np
 import geopandas as gpd
+from shapely.geometry import Polygon
+import pandas as pd
+
+def ad_to_gdf(ad_params,billboard_height = 10):
+    '''
+    Generate a GeoDataFrame from ad_params for visualization.
+
+    **Parameters**
+    ad_params : dict
+        Parameters of advertisement.
+    billboard_height : number
+        The height of the billboard
+    
+        
+    **Return**
+    ad_gdf : GeoDataFrame
+        advertisment GeoDataFrame
+    '''
+    ad_gdf = []   
+    width = 0.02     
+    gap = 0.000001
+    if ('point1' in ad_params)&('point2' in ad_params):
+        adp1 = ad_params['point1']
+        adp2 = ad_params['point2']
+
+        billboard_gdf = gpd.GeoDataFrame({'geometry': [
+                Polygon([[adp1[0],adp1[1],ad_params['height']],
+                [adp1[0]+gap,adp1[1]+gap,ad_params['height']+billboard_height],
+                [adp2[0]+gap,adp2[1]+gap,ad_params['height']+billboard_height],
+                [adp2[0],adp2[1],ad_params['height']]]),
+                Polygon([
+                [(adp1[0]+ adp2[0]) / 2 - width * (adp2[0]- adp1[0]) - gap, (adp1[1] + adp2[1]) / 2 - width * (adp2[1] - adp1[1]) - gap, ad_params['height']],
+                [width * (adp2[0]- adp1[0]) + (adp1[0]+ adp2[0]) / 2 - gap, width * (adp2[1] - adp1[1]) + (adp1[1] + adp2[1]) / 2 - gap, ad_params['height']],
+                [width * (adp2[0]- adp1[0]) + (adp1[0]+ adp2[0]) / 2, width * (adp2[1] - adp1[1]) + (adp1[1] + adp2[1]) / 2, 0],
+                [(adp1[0]+ adp2[0]) / 2 - width * (adp2[0]- adp1[0]), (adp1[1] + adp2[1]) / 2 - width * (adp2[1] - adp1[1]), 0],
+                ]
+            ),]})
+        ad_gdf.append(billboard_gdf)
+
+    if 'brandCenter' in ad_params:
+        brandCenter = ad_params['brandCenter'][:2]
+        adcenter_gdf = gpd.GeoDataFrame({'geometry': [
+                Polygon([
+                [brandCenter[0]-width/2000,brandCenter[1]-width/2000, 0],
+                [brandCenter[0]-width/2000-gap,brandCenter[1]-width/2000-gap, ad_params['height']],
+                [brandCenter[0]+width/2000-gap,brandCenter[1]+width/2000-gap, ad_params['height']],
+                [brandCenter[0]+width/2000,brandCenter[1]+width/2000, 0]
+                ]
+            ),]})
+        ad_gdf.append(adcenter_gdf)
+
+    ad_gdf = gpd.GeoDataFrame(pd.concat(ad_gdf))
+    return ad_gdf
 
 
 def show_bdshadow(buildings=gpd.GeoDataFrame(),
                   shadows=gpd.GeoDataFrame(),
+                  ad=gpd.GeoDataFrame(),
+                  ad_visualArea=gpd.GeoDataFrame(),
                   height='height',
                   zoom='auto'):
     '''
@@ -46,6 +101,10 @@ def show_bdshadow(buildings=gpd.GeoDataFrame(),
         Buildings. coordinate system should be WGS84
     shadows : GeoDataFrame
         Building shadows. coordinate system should be WGS84
+    ad : GeoDataFrame
+        Advertisment. coordinate system should be WGS84
+    ad_visualArea : GeoDataFrame
+        Visualarea of Advertisment. coordinate system should be WGS84
     height : string
         Column name of building height
     zoom : number
@@ -57,15 +116,163 @@ def show_bdshadow(buildings=gpd.GeoDataFrame(),
     '''
     displaybuilding = buildings.copy()
     displaybuildingshadow = shadows.copy()
+    displayad = ad.copy()
+    displayad_visualArea = ad_visualArea.copy()
     vmapdata = {}
     layers = []
+    if len(displayad_visualArea) == 0:
+        displayad_visualArea['geometry'] = []
+        displayad_visualArea[height] = []
+    else:
+
+        bdcentroid = displayad_visualArea['geometry'].bounds[[
+            'minx', 'miny', 'maxx', 'maxy']]
+        lon_center, lat_center = bdcentroid['minx'].mean(
+        ), bdcentroid['miny'].mean()
+        lon_min, lon_max = bdcentroid['minx'].min(), bdcentroid['maxx'].max()
+        vmapdata['ad_visualArea'] = displayad_visualArea
+        layers.append(
+            {'id': 'lz48o1',
+             'type': 'geojson',
+                     'config': {
+                         'dataId': 'ad_visualArea',
+                         'label': 'ad_visualArea',
+                         'color': [255, 255, 0],
+                         'highlightColor': [252, 242, 26, 255],
+                         'columns': {'geojson': 'geometry'},
+                         'isVisible': True,
+                         'visConfig': {
+                             'opacity': 0.32,
+                             'strokeOpacity': 0.8,
+                             'thickness': 0.5,
+                             'strokeColor': [255, 153, 31],
+                             'colorRange': {'name': 'Global Warming',
+                                            'type': 'sequential',
+                                            'category': 'Uber',
+                                            'colors': ['#5A1846',
+                                                       '#900C3F',
+                                                       '#C70039',
+                                                       '#E3611C',
+                                                       '#F1920E',
+                                                       '#FFC300']},
+                             'strokeColorRange': {'name': 'Global Warming',
+                                                  'type': 'sequential',
+                                                  'category': 'Uber',
+                                                  'colors': ['#5A1846',
+                                                             '#900C3F',
+                                                             '#C70039',
+                                                             '#E3611C',
+                                                             '#F1920E',
+                                                             '#FFC300']},
+                             'radius': 10,
+                             'sizeRange': [0, 10],
+                             'radiusRange': [0, 50],
+                             'heightRange': [0, 500],
+                             'elevationScale': 5,
+                             'enableElevationZoomFactor': True,
+                             'stroked': False,
+                             'filled': True,
+                             'enable3d': False,
+                             'wireframe': False},
+                         'hidden': False,
+                         'textLabel': [{
+                             'field': None,
+                                       'color': [255, 255, 255],
+                                       'size': 18,
+                                       'offset': [0, 0],
+                                       'anchor': 'start',
+                                       'alignment': 'center'}]},
+                     'visualChannels': {
+                         'colorField': None,
+                         'colorScale': 'quantile',
+                         'strokeColorField': None,
+                         'strokeColorScale': 'quantile',
+                         'sizeField': None,
+                         'sizeScale': 'linear',
+                         'heightField': None,
+                         'heightScale': 'linear',
+                                        'radiusField': None,
+                                        'radiusScale': 'linear'}})
+    if len(displayad) == 0:
+        displayad['geometry'] = []
+        displayad[height] = []
+    else:
+        vmapdata['advertisment'] = displayad
+        layers.append(
+            {'id': 'lz48o2',
+             'type': 'geojson',
+                     'config': {
+                         'dataId': 'advertisment',
+                         'label': 'advertisment',
+                         'color': [255, 0, 0],
+                         'highlightColor': [252, 242, 26, 255],
+                         'columns': {'geojson': 'geometry'},
+                         'isVisible': True,
+                         'visConfig': {
+                             'opacity': 0.32,
+                             'strokeOpacity': 0.8,
+                             'thickness': 0.5,
+                             'strokeColor': [255, 153, 31],
+                             'colorRange': {'name': 'Global Warming',
+                                            'type': 'sequential',
+                                            'category': 'Uber',
+                                            'colors': ['#5A1846',
+                                                       '#900C3F',
+                                                       '#C70039',
+                                                       '#E3611C',
+                                                       '#F1920E',
+                                                       '#FFC300']},
+                             'strokeColorRange': {'name': 'Global Warming',
+                                                  'type': 'sequential',
+                                                  'category': 'Uber',
+                                                  'colors': ['#5A1846',
+                                                             '#900C3F',
+                                                             '#C70039',
+                                                             '#E3611C',
+                                                             '#F1920E',
+                                                             '#FFC300']},
+                             'radius': 10,
+                             'sizeRange': [0, 10],
+                             'radiusRange': [0, 50],
+                             'heightRange': [0, 500],
+                             'elevationScale': 5,
+                             'enableElevationZoomFactor': True,
+                             'stroked': False,
+                             'filled': True,
+                             'enable3d': False,
+                             'wireframe': False},
+                         'hidden': False,
+                         'textLabel': [{
+                             'field': None,
+                                       'color': [255, 255, 255],
+                                       'size': 18,
+                                       'offset': [0, 0],
+                                       'anchor': 'start',
+                                       'alignment': 'center'}]},
+                     'visualChannels': {
+                         'colorField': None,
+                         'colorScale': 'quantile',
+                         'strokeColorField': None,
+                         'strokeColorScale': 'quantile',
+                         'sizeField': None,
+                         'sizeScale': 'linear',
+                         'heightField': None,
+                         'heightScale': 'linear',
+                                        'radiusField': None,
+                                        'radiusScale': 'linear'}})
+        bdcentroid = displayad['geometry'].bounds[[
+            'minx', 'miny', 'maxx', 'maxy']]
+        lon_center, lat_center = bdcentroid['minx'].mean(
+        ), bdcentroid['miny'].mean()
+        lon_min, lon_max = bdcentroid['minx'].min(), bdcentroid['maxx'].max()
+
     if len(displaybuilding) == 0:
         displaybuilding['geometry'] = []
         displaybuilding[height] = []
     else:
         vmapdata['building'] = displaybuilding
         layers.append({
-            'id': '4eo0v3',
+            'id': 'lz48o3',
             'type': 'geojson',
             'config': {
                 'dataId': 'building',
@@ -102,7 +309,7 @@ def show_bdshadow(buildings=gpd.GeoDataFrame(),
                                 'sizeRange': [0, 10],
                                 'radiusRange': [0, 50],
                                 'heightRange': [0, 500],
-                                'elevationScale': 0.1,
+                                'elevationScale': 0.5,
                                 'enableElevationZoomFactor': True,
                                 'stroked': False,
                                 'filled': True,
@@ -142,7 +349,7 @@ def show_bdshadow(buildings=gpd.GeoDataFrame(),
         lon_min, lon_max = bdcentroid['minx'].min(), bdcentroid['maxx'].max()
         vmapdata['shadow'] = displaybuildingshadow
         layers.append(
-            {'id': 'lz48o1',
+            {'id': 'lz48o4',
              'type': 'geojson',
                      'config': {
                          'dataId': 'shadow',

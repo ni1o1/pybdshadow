@@ -32,7 +32,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-__version__ = '0.1.2'
+__version__ = '0.2.0'
 __author__ = 'Qing Yu <qingyu0815@foxmail.com>'
 
 # module level doc-string
@@ -41,7 +41,9 @@ __doc__ = """
 """
 
 from .pybdshadow import (
-    bdshadow_sunlight
+    bdshadow_sunlight,
+    bdshadow_pointlight,
+    ad_visualArea
 )
 from .preprocess import (
     bd_preprocess,
@@ -49,8 +51,13 @@ from .preprocess import (
 )
 from .visualization import (
     show_bdshadow,
+    ad_to_gdf
 )
 __all__ = ['bdshadow_sunlight',
-           'show_bdshadow',
+           'bdshadow_pointlight',
+           'ad_visualArea',
            'bd_preprocess',
-           'merge_shadow']
+           'merge_shadow',
+           'ad_to_gdf',
+           'show_bdshadow',
+           ]

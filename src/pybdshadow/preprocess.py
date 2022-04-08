@@ -32,8 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import shapely
 import pandas as pd
 import geopandas as gpd
+from shapely.geometry import MultiPolygon
 
-def bd_preprocess(buildings):
+def bd_preprocess(buildings,height='height'):
     '''
     Preprocess building data, so that we can perform shadow calculation.
     Remove empty polygons and convert multipolygons into polygons.
@@ -41,12 +42,18 @@ def bd_preprocess(buildings):
     **Parameters**
     buildings : GeoDataFrame
         Buildings. 
-
+    height : string
+        Column name of building height
+        
     **Return**
     allbds : GeoDataFrame
         Polygon buildings
     '''
-    buildings = buildings[buildings.is_valid]
+    buildings = buildings[buildings.is_valid].copy()
+    #建筑高度筛选
+    buildings[height] = pd.to_numeric(buildings[height],errors = 'coerce')
+    buildings = buildings[-buildings[height].isnull()].copy()
+
     polygon_buildings = buildings[buildings['geometry'].apply(
         lambda r:type(r) == shapely.geometry.polygon.Polygon)]
     multipolygon_buildings = buildings[buildings['geometry'].apply(
@@ -83,12 +90,6 @@ def merge_shadow(data, col = 'building_id'):
     data1 : GeoDataFrame
         The merged polygon
     '''
-    groupnames = []
-    geometries = []
-    for i in data[col].drop_duplicates():
-        groupnames.append(i)
-        geometries.append(data[data[col] == i].unary_union)
-    data1 = gpd.GeoDataFrame()
-    data1['geometry'] = geometries
-    data1[col] = groupnames
+    
+    data1 = data.groupby([col])['geometry'].apply(lambda df:MultiPolygon(list(df)).buffer(0)).reset_index()
     return data1

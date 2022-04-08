@@ -27,19 +27,23 @@ class Testpybdshadow:
         buildings = pybdshadow.bd_preprocess(buildings)
 
         buildingshadow = pybdshadow.bdshadow_sunlight(
-            buildings, date, merge = True)
+            buildings, date, merge=True)
 
         area = buildingshadow['geometry'].iloc[0]
         area = np.array(area.exterior.coords)
-        truth = np.array([[139.698311  ,  35.533642  ],
-                        [139.698311  ,  35.533796  ],
-                        [139.69831237,  35.53429879],
-                        [139.69888937,  35.53429679],
-                        [139.69889237,  35.53467278],
-                        [139.69908037,  35.53467278],
-                        [139.699079  ,  35.53417   ],
-                        [139.699075  ,  35.533637  ],
-                        [139.698311  ,  35.533642  ]])
+        truth = np.array([[139.698311,  35.533796],
+                          [139.69831102,  35.533796],
+                          [139.69831102,  35.533796],
+                          [139.69831239,  35.53429879],
+                          [139.69888939,  35.53429679],
+                          [139.69889239,  35.53467279],
+                          [139.69908039,  35.53467279],
+                          [139.69907902,  35.53417],
+                          [139.69907502,  35.533637],
+                          [139.699075,  35.533637],
+                          [139.699075,  35.533637],
+                          [139.698311,  35.533642],
+                          [139.698311,  35.533796]])
         assert np.allclose(area, truth)
 
         pybdshadow.show_bdshadow(buildings=buildings,
