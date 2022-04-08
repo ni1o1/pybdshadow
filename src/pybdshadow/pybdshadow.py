@@ -64,10 +64,9 @@ def lonlat_mercator_vector(lonlat):
 def mercator_lonlat(mercator):
     lonlat = mercator.copy()
     lonlat[0] = mercator[0]/20037508.34*180
-    lonlat[1] = mercator[1]/20037508.34*180
+    temp = mercator[1]/20037508.34*180
     lonlat[1] = 180/math.pi * \
-        (2*math.atan(math.exp(lonlat[1]*math.pi/180)) - math.pi/2)
-
+        (2*math.atan(math.exp(temp*math.pi/180)) - math.pi/2) #纬度的长度
     return lonlat
 
 
@@ -312,18 +311,30 @@ def bdshadow_pointlight(buildings,pointlon,pointlat,pointheight, merge=True, hei
     return walls
 
 def calOrientation(p1,p2):
-    k = (p2[1]-p1[1])/(p2[0]-p1[0])
-    k = -1/k
-    orientation = math.tan(k)
+    p1 = lonlat_mercator(p1)
+    p2 = lonlat_mercator(p2)
+    
+    if p2[0] != p1[0]:
+        k = (p2[1] - p1[1])/(p2[0] - p1[0])
+        #print('k',k)
+        if k == 0:
+            k = 0.0000001
+        k = -1/k
+    else:
+        k = 0 
+    #print('k',k)
+    orientation = math.atan(k)
     if orientation <0:
-        orientation += math.pi/2
+        orientation += math.pi
     return orientation
 
-def initialVisualRange(brandCenter, orientation, xResolution = 0.01, isAngle = True,eyeResolution = 3):
+def initialVisualRange(brandCenter, orientation, xResolution = 0.01, isAngle = True,eyeResolution = 3 ,direction = 1):
+    #direction：广告牌的朝向，有1和-1两个枚举类型
+    
     #广告牌的位置，面向的角度，
-    print(brandCenter)
+    #print(orientation)
     brandCenterM = lonlat_mercator(brandCenter)
-    print(brandCenter,brandCenterM)
+    #print(brandCenter,brandCenterM)
     
     if isAngle == True:
         eyeResolution = (eyeResolution / 60) / 60
@@ -335,9 +346,10 @@ def initialVisualRange(brandCenter, orientation, xResolution = 0.01, isAngle = T
     if visualR > brandCenter[2]:
         visualGroundR = math.sqrt((math.pow(D, 2)) / 4 - (math.pow(brandCenterM[2], 2))) #地面上的可视化半径
     else:
-        visualGroundR = 0;
+        visualGroundR = 0
     
-    visualCenter = [brandCenterM[0] + visualR * math.cos(orientation),brandCenterM[1] + visualR * math.sin(orientation)]
+    visualCenter = [brandCenterM[0] - visualR * math.cos(orientation)*direction,
+                    brandCenterM[1] - visualR * math.sin(orientation)*direction]
     
     #生成可视区域面，原理就是对中心点取buffer构成圆
     visualArea_circle = Point(visualCenter).buffer(visualGroundR)
@@ -348,7 +360,7 @@ def initialVisualRange(brandCenter, orientation, xResolution = 0.01, isAngle = T
 
     visualArea = {
         'brandCenter': brandCenter,
-        'visualR': visualR,
+        #'visualR': visualR,
         'visualGroundR': visualGroundR,
         'visualCenter': visualCenter,
     }
