@@ -32,49 +32,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import pandas as pd
 import geopandas as gpd
 from suncalc import get_position
-from shapely.geometry import Polygon, Point
+from shapely.geometry import Polygon
 import math
 import numpy as np
 from .preprocess import merge_shadow
+from .utils import  (
+    lonlat_mercator,
+    lonlat_mercator_vector,
+    mercator_lonlat,
+    mercator_lonlat_vector
+    )
 
-
-def lonlat_mercator(lonlat):
-    mercator = lonlat.copy()
-    earthRad = 6378137.0
-    mercator[0] = lonlat[0] * math.pi / 180 * earthRad  # 角度转弧度
-    a = lonlat[1] * math.pi / 180  # 弧度制纬度
-    mercator[1] = earthRad / 2 * \
-        math.log((1.0 + math.sin(a)) / (1.0 - math.sin(a)))
-    return mercator
-
-
-def lonlat_mercator_vector(lonlat):
-    mercator = np.zeros_like(lonlat)
-    earthRad = 6378137.0
-    mercator[:, :, 0] = lonlat[:, :, 0] * math.pi / 180 * earthRad  # 角度转弧度
-    a = lonlat[:, :, 1] * math.pi / 180  # 弧度制纬度
-    mercator[:, :, 1] = earthRad / 2 * \
-        np.log((1.0 + np.sin(a)) / (1.0 - np.sin(a)))
-    return mercator
-
-
-def mercator_lonlat(mercator):
-    lonlat = mercator.copy()
-    lonlat[0] = mercator[0]/20037508.34*180
-    temp = mercator[1]/20037508.34*180
-    lonlat[1] = 180/math.pi * \
-        (2*math.atan(math.exp(temp*math.pi/180)) - math.pi/2)  # 纬度的长度
-    return lonlat
-
-
-def mercator_lonlat_vector(mercator):
-    lonlat = np.zeros_like(mercator)
-    lonlat[:, :, 0] = mercator[:, :, 0]/20037508.34*180
-    lonlat[:, :, 1] = mercator[:, :, 1]/20037508.34*180
-    lonlat[:, :, 1] = 180/math.pi * \
-        (2*np.arctan(np.exp(lonlat[:, :, 1]*math.pi/180)) - math.pi/2)
-
-    return lonlat
 
 
 def calSunShadow_vector(shape, shapeHeight, sunPosition):
@@ -276,112 +244,3 @@ def bdshadow_pointlight(buildings, pointlon, pointlat, pointheight, merge=True, 
     return walls
 
 
-def calOrientation(p1, p2):
-    p1 = lonlat_mercator(p1)
-    p2 = lonlat_mercator(p2)
-
-    if p2[0] != p1[0]:
-        k = (p2[1] - p1[1])/(p2[0] - p1[0])
-        # print('k',k)
-        if k == 0:
-            k = 0.0000001
-        k = -1/k
-    else:
-        k = 0
-    # print('k',k)
-    orientation = math.atan(k)
-    if orientation < 0:
-        orientation += math.pi
-    return orientation
-
-
-def initialVisualRange(brandCenter, orientation, xResolution=0.01, isAngle=True, eyeResolution=3, direction=1):
-    # direction：广告牌的朝向，有1和-1两个枚举类型
-
-    # 广告牌的位置，面向的角度，
-    # print(orientation)
-    brandCenterM = lonlat_mercator(brandCenter)
-    # print(brandCenter,brandCenterM)
-
-    if isAngle == True:
-        eyeResolution = (eyeResolution / 60) / 60
-        eyeResolution = (eyeResolution * math.pi) / 180  # 人眼分辨率，弧度
-
-    D = xResolution / eyeResolution
-    # 半径
-    visualR = D / 2  # 单位m
-    if visualR > brandCenter[2]:
-        visualGroundR = math.sqrt(
-            (math.pow(D, 2)) / 4 - (math.pow(brandCenterM[2], 2)))  # 地面上的可视化半径
-    else:
-        visualGroundR = 0
-
-    visualCenter = [brandCenterM[0] - visualR * math.cos(orientation)*direction,
-                    brandCenterM[1] - visualR * math.sin(orientation)*direction]
-
-    # 生成可视区域面，原理就是对中心点取buffer构成圆
-    visualArea_circle = Point(visualCenter).buffer(visualGroundR)
-    # 再转为经纬度坐标系
-    visualArea_circle = Polygon(mercator_lonlat_vector(
-        np.array([visualArea_circle.exterior.coords]))[0])
-
-    visualCenter = mercator_lonlat(visualCenter)
-
-    visualArea = {
-        'brandCenter': brandCenter,
-        # 'visualR': visualR,
-        'visualGroundR': visualGroundR,
-        'visualCenter': visualCenter,
-    }
-    return visualArea, visualArea_circle
-
-
-def ad_visualArea(ad_params, buildings=gpd.GeoDataFrame(), height='height'):
-    '''
-    Calculate visual area for advertisement.
-
-    **Parameters**
-    ad_params : dict
-        Parameters of advertisement.
-    buildings : GeoDataFrame
-        Buildings. coordinate system should be WGS84
-    height : string
-        Column name of building height
-
-    **Return**
-    visualArea : GeoDataFrame
-        Visual Area of the advertisement
-    shadows : GeoDataFrame
-        Building shadows
-    '''
-    if len(buildings) == 0:
-        buildings['geometry'] = []
-        buildings[height] = []
-
-    if 'orientation' not in ad_params:
-        ad_params['orientation'] = calOrientation(
-            ad_params['point1']+[ad_params['height']], ad_params['point2']+[ad_params['height']])
-    if 'brandCenter' not in ad_params:
-        ad_params['brandCenter'] = list(
-            (np.array(ad_params['point1'])+np.array(ad_params['point2']))/2)
-
-    # calculate initial visualRange
-    brandCenter = ad_params['brandCenter']
-    _, visualArea_circle = initialVisualRange(
-        ad_params['brandCenter']+[ad_params['height']], ad_params['orientation'])
-    visualArea_circle = gpd.GeoDataFrame({'geometry': [visualArea_circle]})
-    visualArea_circle.crs = buildings.crs
-
-    # filter buildings inside visualRange
-    ad_buildings = gpd.sjoin(buildings, visualArea_circle)
-
-    # calculate building shadow
-    shadows = bdshadow_pointlight(
-        ad_buildings, brandCenter[0], brandCenter[1], ad_params['height'])
-
-    # calculate visual area
-    shadows.crs = visualArea_circle.crs
-    visualArea = visualArea_circle.difference(
-        gpd.clip(visualArea_circle, shadows))
-    visualArea = gpd.GeoDataFrame(visualArea, columns=['geometry'])
-    return visualArea, shadows

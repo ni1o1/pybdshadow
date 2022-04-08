@@ -1,6 +1,4 @@
 """
-`pybdshadow`: Python package to generate building shadow geometry.
-
 BSD 3-Clause License
 
 Copyright (c) 2022, Qing Yu
@@ -32,34 +30,43 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-__version__ = '0.2.0'
-__author__ = 'Qing Yu <qingyu0815@foxmail.com>'
+import math
+import numpy as np
 
-# module level doc-string
-__doc__ = """
-`pybdshadow` - Python package to generate building shadow geometry.
-"""
+def lonlat_mercator(lonlat):
+    mercator = lonlat.copy()
+    earthRad = 6378137.0
+    mercator[0] = lonlat[0] * math.pi / 180 * earthRad  # 角度转弧度
+    a = lonlat[1] * math.pi / 180  # 弧度制纬度
+    mercator[1] = earthRad / 2 * \
+        math.log((1.0 + math.sin(a)) / (1.0 - math.sin(a)))
+    return mercator
 
-from .pybdshadow import (
-    bdshadow_sunlight,
-    bdshadow_pointlight
-)
-from .advertisment import(
-    ad_visualArea
-)
-from .preprocess import (
-    bd_preprocess,
-    merge_shadow
-)
-from .visualization import (
-    show_bdshadow,
-    ad_to_gdf
-)
-__all__ = ['bdshadow_sunlight',
-           'bdshadow_pointlight',
-           'ad_visualArea',
-           'bd_preprocess',
-           'merge_shadow',
-           'ad_to_gdf',
-           'show_bdshadow',
-           ]
+
+def lonlat_mercator_vector(lonlat):
+    mercator = np.zeros_like(lonlat)
+    earthRad = 6378137.0
+    mercator[:, :, 0] = lonlat[:, :, 0] * math.pi / 180 * earthRad  # 角度转弧度
+    a = lonlat[:, :, 1] * math.pi / 180  # 弧度制纬度
+    mercator[:, :, 1] = earthRad / 2 * \
+        np.log((1.0 + np.sin(a)) / (1.0 - np.sin(a)))
+    return mercator
+
+
+def mercator_lonlat(mercator):
+    lonlat = mercator.copy()
+    lonlat[0] = mercator[0]/20037508.34*180
+    temp = mercator[1]/20037508.34*180
+    lonlat[1] = 180/math.pi * \
+        (2*math.atan(math.exp(temp*math.pi/180)) - math.pi/2)  # 纬度的长度
+    return lonlat
+
+
+def mercator_lonlat_vector(mercator):
+    lonlat = np.zeros_like(mercator)
+    lonlat[:, :, 0] = mercator[:, :, 0]/20037508.34*180
+    lonlat[:, :, 1] = mercator[:, :, 1]/20037508.34*180
+    lonlat[:, :, 1] = 180/math.pi * \
+        (2*np.arctan(np.exp(lonlat[:, :, 1]*math.pi/180)) - math.pi/2)
+
+    return lonlat
