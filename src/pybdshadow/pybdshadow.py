@@ -111,8 +111,6 @@ def calSunShadow_vector(shape, shapeHeight, sunPosition):
     # print(shadowShape,np.shape(shadowShape))
     return shadowShape
 
-# def mLonlat():
-
 
 def bdshadow_sunlight(buildings, date, merge=True, height='height', ground=0):
     '''
@@ -184,43 +182,9 @@ def bdshadow_sunlight(buildings, date, merge=True, height='height', ground=0):
 
     return walls
 
-
-'''
-待开发功能:
-1. 广告阴影计算
-'''
-# 用xyz表示，方向
-
-
-def calPointLightShadow(shape, shapeHeight, pointLight):
-    # 数据类型：numpy
-
-    pointLightPosition = pointLight['position']
-    #pointLightAngle = pointLight['angle']
-    if pointLightPosition[2] < shapeHeight:
-        pointLightPosition = shapeHeight + 0.001
-    # 高度比
-    scale = shapeHeight/(pointLightPosition - shapeHeight)
-
-    shadowShape = []  # list
-    for i in range(0, 2):
-        vertex = shape[i]
-        shadowShape.append(vertex)
-
-    for i in range(2, 3):  # 计算建筑物的顶部点投影位置
-
-        vertex = shape[3 - i]  # lon lat
-        vertexToLightVector = vertex - pointLightPosition[0:1]
-
-        shadowVertex = vertex + vertexToLightVector*scale
-        shadowShape.append(shadowVertex)
-    vertex = shadowShape[0]
-    shadowShape.append(vertex)
-
-    return shadowShape
-
-
 # 用xyz表示，方向,numpy格式
+
+
 def calPointLightShadow_vector(shape, shapeHeight, pointLight):
     # 多维数据类型：numpy
     # 输入的shape是一个矩阵（n*2*2) n个建筑物面，每个建筑有2个点，每个点有三个维度
