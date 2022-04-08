@@ -37,7 +37,7 @@ import pandas as pd
 
 def ad_to_gdf(ad_params,billboard_height = 10):
     '''
-    Generate a GeoDataFrame from ad_params.
+    Generate a GeoDataFrame from ad_params for visualization.
 
     **Parameters**
     ad_params : dict

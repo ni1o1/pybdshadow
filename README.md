@@ -53,7 +53,7 @@ pip install pybdshadow
 * `geopandas`
 * `matplotlib`
 * [`suncalc`](https://github.com/kylebarron/suncalc-py)
-* `keplergl` (optional)
+* `keplergl`
 
 ## Citation information
 

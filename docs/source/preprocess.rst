@@ -2,11 +2,11 @@
 
 
 *********************
-Preprocess
+Building Preprocess
 *********************
 
 Building preprocess
-=============================
+--------------------------------------
 
 .. function:: pybdshadow.bd_preprocess(buildings)
 
