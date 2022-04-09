@@ -30,6 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
+import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Polygon, Point
 import math
@@ -103,7 +104,58 @@ def initialVisualRange(brandCenter, orientation, xResolution=0.01, isAngle=True,
     return visualArea, visualArea_circle
 
 
-def ad_visualArea(ad_params, buildings=gpd.GeoDataFrame(), height='height'):
+def ad_to_gdf(ad_params,billboard_height = 10):
+    '''
+    Generate a GeoDataFrame from ad_params for visualization.
+
+    **Parameters**
+    ad_params : dict
+        Parameters of advertisement.
+    billboard_height : number
+        The height of the billboard
+    
+        
+    **Return**
+    ad_gdf : GeoDataFrame
+        advertisment GeoDataFrame
+    '''
+    ad_gdf = []   
+    width = 0.02     
+    gap = 0.000001
+    if ('point1' in ad_params)&('point2' in ad_params):
+        adp1 = ad_params['point1']
+        adp2 = ad_params['point2']
+
+        billboard_gdf = gpd.GeoDataFrame({'geometry': [
+                Polygon([[adp1[0],adp1[1],ad_params['height']],
+                [adp1[0]+gap,adp1[1]+gap,ad_params['height']+billboard_height],
+                [adp2[0]+gap,adp2[1]+gap,ad_params['height']+billboard_height],
+                [adp2[0],adp2[1],ad_params['height']]]),
+                Polygon([
+                [(adp1[0]+ adp2[0]) / 2 - width * (adp2[0]- adp1[0]) - gap, (adp1[1] + adp2[1]) / 2 - width * (adp2[1] - adp1[1]) - gap, ad_params['height']],
+                [width * (adp2[0]- adp1[0]) + (adp1[0]+ adp2[0]) / 2 - gap, width * (adp2[1] - adp1[1]) + (adp1[1] + adp2[1]) / 2 - gap, ad_params['height']],
+                [width * (adp2[0]- adp1[0]) + (adp1[0]+ adp2[0]) / 2, width * (adp2[1] - adp1[1]) + (adp1[1] + adp2[1]) / 2, 0],
+                [(adp1[0]+ adp2[0]) / 2 - width * (adp2[0]- adp1[0]), (adp1[1] + adp2[1]) / 2 - width * (adp2[1] - adp1[1]), 0],
+                ]
+            ),]})
+        ad_gdf.append(billboard_gdf)
+
+    if 'brandCenter' in ad_params:
+        brandCenter = ad_params['brandCenter'][:2]
+        adcenter_gdf = gpd.GeoDataFrame({'geometry': [
+                Polygon([
+                [brandCenter[0]-width/2000,brandCenter[1]-width/2000, 0],
+                [brandCenter[0]-width/2000-gap,brandCenter[1]-width/2000-gap, ad_params['height']],
+                [brandCenter[0]+width/2000+gap,brandCenter[1]+width/2000+gap, ad_params['height']],
+                [brandCenter[0]+width/2000,brandCenter[1]+width/2000, 0]
+                ]
+            ),]})
+        ad_gdf.append(adcenter_gdf)
+
+    ad_gdf = gpd.GeoDataFrame(pd.concat(ad_gdf))
+    return ad_gdf
+
+def ad_visualArea(ad_params, buildings=gpd.GeoDataFrame(), height='height', xResolution=0.01, eyeResolution=3):
     '''
     Calculate visual area for advertisement.
 
@@ -114,8 +166,11 @@ def ad_visualArea(ad_params, buildings=gpd.GeoDataFrame(), height='height'):
         Buildings. coordinate system should be WGS84
     height : string
         Column name of building height
+    xResolution, eyeResolution : number
+        Resolution of advertisement and eye
 
     **Return**
+
     visualArea : GeoDataFrame
         Visual Area of the advertisement
     shadows : GeoDataFrame
@@ -135,7 +190,10 @@ def ad_visualArea(ad_params, buildings=gpd.GeoDataFrame(), height='height'):
     # calculate initial visualRange
     brandCenter = ad_params['brandCenter']
     _, visualArea_circle = initialVisualRange(
-        ad_params['brandCenter']+[ad_params['height']], ad_params['orientation'])
+        ad_params['brandCenter']+[ad_params['height']],
+        ad_params['orientation'],
+        xResolution=xResolution,
+        eyeResolution=eyeResolution)
     visualArea_circle = gpd.GeoDataFrame({'geometry': [visualArea_circle]})
     visualArea_circle.crs = buildings.crs
 
@@ -152,6 +210,13 @@ def ad_visualArea(ad_params, buildings=gpd.GeoDataFrame(), height='height'):
         gpd.clip(visualArea_circle, shadows))
     visualArea = gpd.GeoDataFrame(visualArea, columns=['geometry'])
     return visualArea, shadows
+
+
+'''
+广告选址的优化算法
+目前优化的参数是方向，高度，经度，纬度，四个参数
+两个分辨率参数还没有考虑，这个可能需要再考虑
+'''
 
 
 def ad_optimize(bounds, buildings, height_range=[0, 100], multiplier=[0.01, 0.001], printlog=True, size_pop=10, max_iter=30, prob_mut=0.001, precision=1e-7):
@@ -192,36 +257,37 @@ def ad_optimize(bounds, buildings, height_range=[0, 100], multiplier=[0.01, 0.00
                      'height': p[1]/multiplier[1],
                      'brandCenter': [p[2], p[3]]}
         # 计算可视面积
-        visualArea, shadows = ad_visualArea(ad_params, buildings)
+        visualArea, shadows = ad_visualArea(ad_params, buildings) #两个分辨率参数还没有考虑，这个可能需要再考虑
         visualArea.crs = 'epsg:4326'
         area = visualArea.to_crs(epsg=2381)['geometry'].iloc[0].area
-        return -area
+        return -area  # 面积作为目标函数，GA求的是目标函数最小值
 
     # 遗传算法
     from sko.GA import GA
     import math
     ga = GA(func=optimize_func,
-            n_dim=4,
+            n_dim=4,  # 方向，高度，经度，纬度，四个参数，引入两个乘子让四个参数尽可能在同一量级上优化
             size_pop=size_pop,
             max_iter=max_iter,
             prob_mut=prob_mut,
-            lb=[0,
+            lb=[0,  # 四个参数的下边界
                 height_range[0]*multiplier[1],
                 bounds[0],
                 bounds[1]],
-            ub=[2*math.pi*multiplier[0],
+            ub=[2*math.pi*multiplier[0],  # 四个参数的上边界
                 height_range[1]*multiplier[1],
                 bounds[2],
                 bounds[3]],
             precision=precision)
     result = ga.run()
-
     p = result[0]
+
+    # 重构广告参数
     ad_params = {'orientation': p[0]/multiplier[0],
                  'height': p[1]/multiplier[1],
                  'brandCenter': [p[2], p[3]]}
 
-    # 绘制算法结果
+    # 绘制算法的优化过程
     if printlog:
         import pandas as pd
         import matplotlib.pyplot as plt
