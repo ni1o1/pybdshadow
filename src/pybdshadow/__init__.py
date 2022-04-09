@@ -45,7 +45,8 @@ from .pybdshadow import (
     bdshadow_pointlight
 )
 from .advertisment import(
-    ad_visualArea
+    ad_visualArea,
+    ad_optimize
 )
 from .preprocess import (
     bd_preprocess,
@@ -55,9 +56,11 @@ from .visualization import (
     show_bdshadow,
     ad_to_gdf
 )
+
 __all__ = ['bdshadow_sunlight',
            'bdshadow_pointlight',
            'ad_visualArea',
+           'ad_optimize',
            'bd_preprocess',
            'merge_shadow',
            'ad_to_gdf',

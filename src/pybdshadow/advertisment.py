@@ -34,13 +34,14 @@ import geopandas as gpd
 from shapely.geometry import Polygon, Point
 import math
 import numpy as np
-from .utils import  (
+from .utils import (
     lonlat_mercator,
     lonlat_mercator_vector,
     mercator_lonlat,
     mercator_lonlat_vector
-    )
+)
 from .pybdshadow import bdshadow_pointlight
+
 
 def calOrientation(p1, p2):
     p1 = lonlat_mercator(p1)
@@ -151,3 +152,82 @@ def ad_visualArea(ad_params, buildings=gpd.GeoDataFrame(), height='height'):
         gpd.clip(visualArea_circle, shadows))
     visualArea = gpd.GeoDataFrame(visualArea, columns=['geometry'])
     return visualArea, shadows
+
+
+def ad_optimize(bounds, buildings, height_range=[0, 100], multiplier=[0.01, 0.001], printlog=True, size_pop=10, max_iter=30, prob_mut=0.001, precision=1e-7):
+    '''
+    Optimize advertisment parameters using Genetic Algorithm
+
+    **Parameters**
+
+    bounds : list
+        Area bounds, should be [lon1,lat1,lon2,lat2]
+    buildings : GeoDataFrame
+        Buildings. coordinate system should be WGS84
+    height_range : list
+        Height range of advertisment [minheight,maxheight]
+    multiplier : list
+        Multiplier for orientation and height
+    printlog : bool
+        Whether to print the optimization information of Genetic Algorithm
+    size_pop,max_iter,prob_mut,precision :
+        Parameters of Genetic Algorithm
+
+    **Return**
+
+    ad_params : dict
+        Optimized advertisment parameters
+    '''
+
+    try:
+        from sko.GA import GA
+    except ImportError:
+        raise ImportError(
+            "Please install scikit-opt, run following code "
+            "in cmd: pip install scikit-opt")
+
+    # 遗传算法的目标函数，面积最大
+    def optimize_func(p):
+        ad_params = {'orientation': p[0]/multiplier[0],
+                     'height': p[1]/multiplier[1],
+                     'brandCenter': [p[2], p[3]]}
+        # 计算可视面积
+        visualArea, shadows = ad_visualArea(ad_params, buildings)
+        visualArea.crs = 'epsg:4326'
+        area = visualArea.to_crs(epsg=2381)['geometry'].iloc[0].area
+        return -area
+
+    # 遗传算法
+    from sko.GA import GA
+    import math
+    ga = GA(func=optimize_func,
+            n_dim=4,
+            size_pop=size_pop,
+            max_iter=max_iter,
+            prob_mut=prob_mut,
+            lb=[0,
+                height_range[0]*multiplier[1],
+                bounds[0],
+                bounds[1]],
+            ub=[2*math.pi*multiplier[0],
+                height_range[1]*multiplier[1],
+                bounds[2],
+                bounds[3]],
+            precision=precision)
+    result = ga.run()
+
+    p = result[0]
+    ad_params = {'orientation': p[0]/multiplier[0],
+                 'height': p[1]/multiplier[1],
+                 'brandCenter': [p[2], p[3]]}
+
+    # 绘制算法结果
+    if printlog:
+        import pandas as pd
+        import matplotlib.pyplot as plt
+        Y_history = pd.DataFrame(ga.all_history_Y)
+        _, ax = plt.subplots(2, 1)
+        ax[0].plot(Y_history.index, Y_history.values, '.', color='red')
+        Y_history.min(axis=1).cummin().plot(kind='line')
+        plt.show()
+    return ad_params

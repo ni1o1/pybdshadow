@@ -150,8 +150,6 @@ def bdshadow_sunlight(buildings, date, merge=True, height='height', ground=0):
 
     return walls
 
-# 用xyz表示，方向,numpy格式
-
 
 def calPointLightShadow_vector(shape, shapeHeight, pointLight):
     # 多维数据类型：numpy
@@ -228,7 +226,7 @@ def bdshadow_pointlight(buildings, pointlon, pointlat, pointheight, merge=True, 
                                            [r['x2'], r['y2']]], axis=1)
     walls_shape = np.array(list(walls['wall']))
 
-    # 在这里创建点光源
+    # Create point light
     pointLightPosition = {'position': [pointlon, pointlat, pointheight]}
     # calculate shadow for walls
     shadowShape = calPointLightShadow_vector(
