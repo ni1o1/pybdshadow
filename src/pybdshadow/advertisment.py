@@ -293,7 +293,10 @@ def ad_optimize(bounds, buildings, height_range=[0, 100], multiplier=[0.01, 0.00
         import matplotlib.pyplot as plt
         Y_history = pd.DataFrame(ga.all_history_Y)
         _, ax = plt.subplots(2, 1)
-        ax[0].plot(Y_history.index, Y_history.values, '.', color='red')
-        Y_history.min(axis=1).cummin().plot(kind='line')
+        ax[0].plot(Y_history.index, -Y_history.values, '.', color='red')
+        (-Y_history.min(axis=1).cummin()).plot(kind='line')
+        plt.ylabel('Visual area($m^2$)')
+        plt.xlabel('Iters')
         plt.show()
+
     return ad_params
