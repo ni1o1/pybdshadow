@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import math
 import numpy as np
 
+
 def lonlat_mercator(lonlat):
     mercator = lonlat.copy()
     earthRad = 6378137.0

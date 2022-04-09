@@ -33,24 +33,25 @@ import shapely
 import pandas as pd
 import geopandas as gpd
 
-def bd_preprocess(buildings,height='height'):
+
+def bd_preprocess(buildings, height='height'):
     '''
     Preprocess building data, so that we can perform shadow calculation.
     Remove empty polygons and convert multipolygons into polygons.
 
     **Parameters**
     buildings : GeoDataFrame
-        Buildings. 
+        Buildings.
     height : string
         Column name of building height
-        
+
     **Return**
     allbds : GeoDataFrame
         Polygon buildings
     '''
     buildings = buildings[buildings.is_valid].copy()
-    #建筑高度筛选
-    buildings[height] = pd.to_numeric(buildings[height],errors = 'coerce')
+    # 建筑高度筛选
+    buildings[height] = pd.to_numeric(buildings[height], errors='coerce')
     buildings = buildings[-buildings[height].isnull()].copy()
 
     polygon_buildings = buildings[buildings['geometry'].apply(

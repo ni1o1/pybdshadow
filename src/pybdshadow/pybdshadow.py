@@ -32,16 +32,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import pandas as pd
 import geopandas as gpd
 from suncalc import get_position
-from shapely.geometry import Polygon,MultiPolygon
+from shapely.geometry import Polygon, MultiPolygon
 import math
 import numpy as np
-from .utils import  (
-    lonlat_mercator,
+from .utils import (
     lonlat_mercator_vector,
-    mercator_lonlat,
     mercator_lonlat_vector
-    )
-
+)
 
 
 def calSunShadow_vector(shape, shapeHeight, sunPosition):
@@ -110,12 +107,6 @@ def bdshadow_sunlight(buildings, date, merge=True, height='height', ground=0):
     lon = (lon1+lon2)/2
     lat = (lat1+lat2)/2
 
-    # 测试坐标转换函数是否可行
-    # points = gpd.GeoSeries([geometry.Point(lon,lat)],crs='EPSG:4326') # 指定坐标系为WGS 1984
-    # points2 = points.to_crs(epsg=epsg) #用自带的函数计算
-    # points1 = lonlat_mercator([lon,lat])#用自定义的函数计算
-    # print("zidong",points2,points1)
-
     # obtain sun position
     sunPosition = get_position(date, lon, lat)
     buildingshadow = building.copy()
@@ -124,7 +115,8 @@ def bdshadow_sunlight(buildings, date, merge=True, height='height', ground=0):
     buildingshadow['wall'] = a
     buildingshadow = buildingshadow.set_index(['building_id'])
     a = buildingshadow.apply(lambda x: pd.Series(x['wall']), axis=1).unstack()
-    walls = a[- a.isnull()].reset_index().sort_values(by=['building_id', 'level_0'])
+    walls = a[- a.isnull()].reset_index().sort_values(
+        by=['building_id', 'level_0'])
     walls = pd.merge(walls, buildingshadow['height'].reset_index())
     walls['x1'] = walls[0].apply(lambda r: r[0])
     walls['y1'] = walls[0].apply(lambda r: r[1])
@@ -145,7 +137,8 @@ def bdshadow_sunlight(buildings, date, merge=True, height='height', ground=0):
     walls = gpd.GeoDataFrame(walls)
     walls = pd.concat([walls, building])
     if merge:
-        walls = walls.groupby(['building_id'])['geometry'].apply(lambda df:MultiPolygon(list(df)).buffer(0)).reset_index()
+        walls = walls.groupby(['building_id'])['geometry'].apply(
+            lambda df: MultiPolygon(list(df)).buffer(0)).reset_index()
 
     return walls
 
@@ -158,7 +151,6 @@ def calPointLightShadow_vector(shape, shapeHeight, pointLight):
     pointLightPosition = pointLight['position']  # [lon,lat,height]
 
     # 高度比
-    #scale[scale<=0] =1000
     diff = pointLightPosition[2] - shapeHeight
     scale = np.zeros(n)
     scale[diff != 0] = shapeHeight[diff != 0]/(diff[diff != 0])
@@ -170,16 +162,23 @@ def calPointLightShadow_vector(shape, shapeHeight, pointLight):
     shadowShape[:, 0:2, :] += shape  # 前两个点不变
     vertexToLightVector = shape - pointLightPosition[0:2]  # n,2,2
 
-    shadowShape[:, 2, :] = shape[:, 1, :] + vertexToLightVector[:,
-                                                                1, :]*scale  # [n,2,2] = [n,2,2]+[n,2,2]*n
-    shadowShape[:, 3, :] = shape[:, 0, :] + vertexToLightVector[:, 0, :]*scale
+    shadowShape[:, 2, :] = shape[:, 1, :] + \
+        vertexToLightVector[:, 1, :]*scale  # [n,2,2] = [n,2,2]+[n,2,2]*n
+    shadowShape[:, 3, :] = shape[:, 0, :] + \
+        vertexToLightVector[:, 0, :]*scale
 
     shadowShape[:, 4, :] = shadowShape[:, 0, :]
 
     return shadowShape
 
 
-def bdshadow_pointlight(buildings, pointlon, pointlat, pointheight, merge=True, height='height', ground=0):
+def bdshadow_pointlight(buildings,
+                        pointlon,
+                        pointlat,
+                        pointheight,
+                        merge=True,
+                        height='height',
+                        ground=0):
     '''
     Calculate the sunlight shadow of the buildings.
 
@@ -213,7 +212,8 @@ def bdshadow_pointlight(buildings, pointlon, pointlat, pointheight, merge=True, 
     buildingshadow['wall'] = a
     buildingshadow = buildingshadow.set_index(['building_id'])
     a = buildingshadow.apply(lambda x: pd.Series(x['wall']), axis=1).unstack()
-    walls = a[- a.isnull()].reset_index().sort_values(by=['building_id', 'level_0'])
+    walls = a[- a.isnull()].reset_index().sort_values(
+        by=['building_id', 'level_0'])
     walls = pd.merge(walls, buildingshadow['height'].reset_index())
     walls['x1'] = walls[0].apply(lambda r: r[0])
     walls['y1'] = walls[0].apply(lambda r: r[1])
@@ -236,8 +236,7 @@ def bdshadow_pointlight(buildings, pointlon, pointlat, pointheight, merge=True, 
     walls = gpd.GeoDataFrame(walls)
     walls = pd.concat([walls, building])
     if merge:
-        walls = walls.groupby(['building_id'])['geometry'].apply(lambda df:MultiPolygon(list(df)).buffer(0)).reset_index()
+        walls = walls.groupby(['building_id'])['geometry'].apply(
+            lambda df: MultiPolygon(list(df)).buffer(0)).reset_index()
 
     return walls
-
-

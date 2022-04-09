@@ -1,5 +1,4 @@
 import pybdshadow
-import pandas as pd
 import numpy as np
 import geopandas as gpd
 from shapely.geometry import Polygon
@@ -9,7 +8,7 @@ class Testadvisualarea:
     def test_advisualarea(self):
         buildings = gpd.GeoDataFrame({
             'height': [42],
-            'building_id':1,
+            'building_id': 1,
             'geometry': [
                 Polygon([(139.714612, 35.551441),
                          (139.714616, 35.55144),
