@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import shapely
 import pandas as pd
 import geopandas as gpd
-from shapely.geometry import MultiPolygon
 
 def bd_preprocess(buildings,height='height'):
     '''
@@ -71,25 +70,3 @@ def bd_preprocess(buildings,height='height'):
     allbds = pd.concat(allbds)
     allbds['building_id'] = range(len(allbds))
     return allbds
-
-def merge_shadow(data, col = 'building_id'):
-    '''
-    The input is the GeoDataFrame of polygon geometry, and the col
-    name. This function will merge the polygon based on the category
-    in the mentioned column
-
-    Parameters
-    -------
-    data : GeoDataFrame
-        The polygon geometry
-    col : str
-        The column name for indicating category
-
-    Returns
-    -------
-    data1 : GeoDataFrame
-        The merged polygon
-    '''
-    
-    data1 = data.groupby([col])['geometry'].apply(lambda df:MultiPolygon(list(df)).buffer(0)).reset_index()
-    return data1

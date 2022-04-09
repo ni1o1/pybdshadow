@@ -32,10 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import pandas as pd
 import geopandas as gpd
 from suncalc import get_position
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon,MultiPolygon
 import math
 import numpy as np
-from .preprocess import merge_shadow
 from .utils import  (
     lonlat_mercator,
     lonlat_mercator_vector,
@@ -146,7 +145,7 @@ def bdshadow_sunlight(buildings, date, merge=True, height='height', ground=0):
     walls = gpd.GeoDataFrame(walls)
     walls = pd.concat([walls, building])
     if merge:
-        walls = merge_shadow(walls)
+        walls = walls.groupby(['building_id'])['geometry'].apply(lambda df:MultiPolygon(list(df)).buffer(0)).reset_index()
 
     return walls
 
@@ -237,7 +236,7 @@ def bdshadow_pointlight(buildings, pointlon, pointlat, pointheight, merge=True, 
     walls = gpd.GeoDataFrame(walls)
     walls = pd.concat([walls, building])
     if merge:
-        walls = merge_shadow(walls)
+        walls = walls.groupby(['building_id'])['geometry'].apply(lambda df:MultiPolygon(list(df)).buffer(0)).reset_index()
 
     return walls
 

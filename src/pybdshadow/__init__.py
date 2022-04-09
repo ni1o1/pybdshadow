@@ -50,8 +50,7 @@ from .advertisment import(
     ad_optimize
 )
 from .preprocess import (
-    bd_preprocess,
-    merge_shadow
+    bd_preprocess
 )
 from .visualization import (
     show_bdshadow,
