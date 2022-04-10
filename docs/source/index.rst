@@ -12,7 +12,6 @@ pybdshadow
 `pybdshadow` is a python package to calculate building shadow geometry from parallel light source (sunlight) or point light source (Advertisement). 
 
 
-
 Example
 ---------------------------------
 
@@ -37,20 +36,25 @@ Given a building GeoDataFrame and UTC datetime, `pybdshadow` can calculate the b
 
 
 
+
 Citation information
 ---------------------------------
 
 Citation information can be found at https://github.com/ni1o1/pybdshadow/blob/main/CITATION.cff.
 
 
-Method
-=========================
 
 .. toctree::
    :caption: Installation and dependencies
    :maxdepth: 2
 
    install.rst
+
+.. toctree::
+   :caption: Example
+   :maxdepth: 2
+
+   example/example.rst
 
 .. toctree::
    :caption: Method
