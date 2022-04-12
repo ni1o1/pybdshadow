@@ -109,7 +109,7 @@ def initialVisualRange(brandCenter,
     return visualArea, visualArea_circle
 
 
-def ad_to_gdf(ad_params, billboard_height=10):
+def ad_to_gdf(ad_params, billboard_height=10, billboard_witdh=20):
     '''
     Generate a GeoDataFrame from ad_params for visualization.
 
@@ -117,7 +117,9 @@ def ad_to_gdf(ad_params, billboard_height=10):
     ad_params : dict
         Parameters of advertisement.
     billboard_height : number
-        The height of the billboard
+        The height of the billboard.
+    billboard_witdh : number
+        Default witdh of the billboard.
 
 
     **Return**
@@ -130,61 +132,50 @@ def ad_to_gdf(ad_params, billboard_height=10):
     if ('point1' in ad_params) & ('point2' in ad_params):
         adp1 = ad_params['point1']
         adp2 = ad_params['point2']
-
-        billboard_gdf = gpd.GeoDataFrame(
-            {'geometry': [
-                Polygon(
-                    [[adp1[0],
-                     adp1[1],
-                      ad_params['height']],
-                     [adp1[0]+gap,
-                      adp1[1]+gap,
-                      ad_params['height']+billboard_height],
-                     [adp2[0]+gap,
-                         adp2[1]+gap,
-                     ad_params['height']+billboard_height],
-                     [adp2[0],
-                         adp2[1],
-                         ad_params['height']]]),
-                Polygon(
-                    [
-                        [(adp1[0] + adp2[0]) / 2 - width *
-                         (adp2[0] - adp1[0]) - gap,
-                         (adp1[1] + adp2[1]) / 2 -
-                         width * (adp2[1] - adp1[1]) - gap,
-                            ad_params['height']],
-                        [width * (adp2[0] - adp1[0]) +
-                         (adp1[0] + adp2[0]) / 2 - gap,
-                         width * (adp2[1] - adp1[1]) +
-                         (adp1[1] + adp2[1]) / 2 - gap,
-                            ad_params['height']],
-                        [width * (adp2[0] - adp1[0]) +
-                         (adp1[0] + adp2[0]) / 2,
-                         width * (adp2[1] - adp1[1]) +
-                         (adp1[1] + adp2[1]) / 2,
-                            0],
-                        [(adp1[0] + adp2[0]) / 2 - width *
-                         (adp2[0] - adp1[0]),
-                         (adp1[1] + adp2[1]) / 2 - width *
-                         (adp2[1] - adp1[1]),
-                            0],
-                    ]
-                ), ]})
-        ad_gdf.append(billboard_gdf)
-
     if 'brandCenter' in ad_params:
         brandCenter = ad_params['brandCenter'][:2]
-        adcenter_gdf = gpd.GeoDataFrame({'geometry': [
-            Polygon([
-                [brandCenter[0]-width/2000, brandCenter[1]-width/2000, 0],
-                [brandCenter[0]-width/2000-gap, brandCenter[1] -
-                    width/2000-gap, ad_params['height']],
-                [brandCenter[0]+width/2000+gap, brandCenter[1] +
-                    width/2000+gap, ad_params['height']],
-                [brandCenter[0]+width/2000, brandCenter[1]+width/2000, 0]
-            ]
+        orientation = ad_params['orientation']
+        adp1 = mercator_lonlat(
+            lonlat_mercator(brandCenter) +
+            np.array([math.sin(math.pi-orientation),
+                      math.cos(math.pi-orientation)])*billboard_witdh)
+        adp2 = mercator_lonlat(
+            lonlat_mercator(brandCenter) -
+            np.array([math.sin(math.pi-orientation),
+                      math.cos(math.pi-orientation)])*billboard_witdh)
+
+    billboard_gdf = gpd.GeoDataFrame(
+        {'geometry': [
+            Polygon(
+                [[adp1[0],
+                    adp1[1],
+                    ad_params['height']],
+                    [adp1[0]+gap,
+                     adp1[1]+gap,
+                     ad_params['height']+billboard_height],
+                    [adp2[0]+gap,
+                        adp2[1]+gap,
+                     ad_params['height']+billboard_height],
+                    [adp2[0],
+                        adp2[1],
+                        ad_params['height']]]),
+            Polygon(
+                [
+                    [(adp1[0] + adp2[0]) / 2 - width/2000 - gap,
+                     (adp1[1] + adp2[1]) / 2 - width / 2000 - gap,
+                        ad_params['height']],
+                    [width/2000 + (adp1[0] + adp2[0]) / 2 - gap,
+                     width/2000 + (adp1[1] + adp2[1]) / 2 - gap,
+                        ad_params['height']],
+                    [width/2000 + (adp1[0] + adp2[0]) / 2,
+                        width/2000 + (adp1[1] + adp2[1]) / 2,
+                        0],
+                    [(adp1[0] + adp2[0]) / 2 - width/2000,
+                        (adp1[1] + adp2[1]) / 2 - width / 2000,
+                        0],
+                ]
             ), ]})
-        ad_gdf.append(adcenter_gdf)
+    ad_gdf.append(billboard_gdf)
 
     ad_gdf = gpd.GeoDataFrame(pd.concat(ad_gdf))
     return ad_gdf
@@ -244,6 +235,8 @@ def ad_visualArea(ad_params,
     shadows = bdshadow_pointlight(
         ad_buildings, brandCenter[0], brandCenter[1], ad_params['height'])
 
+    if len(shadows) == 0:
+        return visualArea_circle, shadows
     # calculate visual area
     shadows.crs = visualArea_circle.crs
     visualArea = visualArea_circle.difference(
@@ -307,6 +300,8 @@ def ad_optimize(bounds,
         # 计算可视面积
         visualArea, shadows = ad_visualArea(
             ad_params, buildings)  # 两个分辨率参数还没有考虑，这个可能需要再考虑
+        if visualArea['geometry'].isnull().iloc[0]:
+            return 0
         visualArea.crs = 'epsg:4326'
         area = visualArea.to_crs(epsg=2381)['geometry'].iloc[0].area
         return -area  # 面积作为目标函数，GA求的是目标函数最小值

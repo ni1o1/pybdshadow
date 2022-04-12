@@ -206,8 +206,14 @@ def bdshadow_pointlight(buildings,
     building[height] -= ground
     building = building[building[height] > 0]
 
+    if len(building) == 0:
+        walls = gpd.GeoDataFrame()
+        walls['geometry'] = []
+        walls['building_id'] = []
+        return walls
     # building to walls
     buildingshadow = building.copy()
+
     a = buildingshadow['geometry'].apply(lambda r: list(r.exterior.coords))
     buildingshadow['wall'] = a
     buildingshadow = buildingshadow.set_index(['building_id'])
