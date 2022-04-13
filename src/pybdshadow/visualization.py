@@ -32,59 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import numpy as np
 import geopandas as gpd
-from shapely.geometry import Polygon
-import pandas as pd
-
-def ad_to_gdf(ad_params,billboard_height = 10):
-    '''
-    Generate a GeoDataFrame from ad_params for visualization.
-
-    **Parameters**
-    ad_params : dict
-        Parameters of advertisement.
-    billboard_height : number
-        The height of the billboard
-    
-        
-    **Return**
-    ad_gdf : GeoDataFrame
-        advertisment GeoDataFrame
-    '''
-    ad_gdf = []   
-    width = 0.02     
-    gap = 0.000001
-    if ('point1' in ad_params)&('point2' in ad_params):
-        adp1 = ad_params['point1']
-        adp2 = ad_params['point2']
-
-        billboard_gdf = gpd.GeoDataFrame({'geometry': [
-                Polygon([[adp1[0],adp1[1],ad_params['height']],
-                [adp1[0]+gap,adp1[1]+gap,ad_params['height']+billboard_height],
-                [adp2[0]+gap,adp2[1]+gap,ad_params['height']+billboard_height],
-                [adp2[0],adp2[1],ad_params['height']]]),
-                Polygon([
-                [(adp1[0]+ adp2[0]) / 2 - width * (adp2[0]- adp1[0]) - gap, (adp1[1] + adp2[1]) / 2 - width * (adp2[1] - adp1[1]) - gap, ad_params['height']],
-                [width * (adp2[0]- adp1[0]) + (adp1[0]+ adp2[0]) / 2 - gap, width * (adp2[1] - adp1[1]) + (adp1[1] + adp2[1]) / 2 - gap, ad_params['height']],
-                [width * (adp2[0]- adp1[0]) + (adp1[0]+ adp2[0]) / 2, width * (adp2[1] - adp1[1]) + (adp1[1] + adp2[1]) / 2, 0],
-                [(adp1[0]+ adp2[0]) / 2 - width * (adp2[0]- adp1[0]), (adp1[1] + adp2[1]) / 2 - width * (adp2[1] - adp1[1]), 0],
-                ]
-            ),]})
-        ad_gdf.append(billboard_gdf)
-
-    if 'brandCenter' in ad_params:
-        brandCenter = ad_params['brandCenter'][:2]
-        adcenter_gdf = gpd.GeoDataFrame({'geometry': [
-                Polygon([
-                [brandCenter[0]-width/2000,brandCenter[1]-width/2000, 0],
-                [brandCenter[0]-width/2000-gap,brandCenter[1]-width/2000-gap, ad_params['height']],
-                [brandCenter[0]+width/2000-gap,brandCenter[1]+width/2000-gap, ad_params['height']],
-                [brandCenter[0]+width/2000,brandCenter[1]+width/2000, 0]
-                ]
-            ),]})
-        ad_gdf.append(adcenter_gdf)
-
-    ad_gdf = gpd.GeoDataFrame(pd.concat(ad_gdf))
-    return ad_gdf
 
 
 def show_bdshadow(buildings=gpd.GeoDataFrame(),

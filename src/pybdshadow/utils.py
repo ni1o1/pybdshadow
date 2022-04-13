@@ -29,45 +29,45 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
-import shapely
-import pandas as pd
-import geopandas as gpd
+
+import math
+import numpy as np
 
 
-def bd_preprocess(buildings, height='height'):
-    '''
-    Preprocess building data, so that we can perform shadow calculation.
-    Remove empty polygons and convert multipolygons into polygons.
+def lonlat_mercator(lonlat):
+    mercator = lonlat.copy()
+    earthRad = 6378137.0
+    mercator[0] = lonlat[0] * math.pi / 180 * earthRad  # 角度转弧度
+    a = lonlat[1] * math.pi / 180  # 弧度制纬度
+    mercator[1] = earthRad / 2 * \
+        math.log((1.0 + math.sin(a)) / (1.0 - math.sin(a)))
+    return mercator
 
-    **Parameters**
-    buildings : GeoDataFrame
-        Buildings.
-    height : string
-        Column name of building height
 
-    **Return**
-    allbds : GeoDataFrame
-        Polygon buildings
-    '''
-    buildings = buildings[buildings.is_valid].copy()
-    # 建筑高度筛选
-    buildings[height] = pd.to_numeric(buildings[height], errors='coerce')
-    buildings = buildings[-buildings[height].isnull()].copy()
+def lonlat_mercator_vector(lonlat):
+    mercator = np.zeros_like(lonlat)
+    earthRad = 6378137.0
+    mercator[:, :, 0] = lonlat[:, :, 0] * math.pi / 180 * earthRad  # 角度转弧度
+    a = lonlat[:, :, 1] * math.pi / 180  # 弧度制纬度
+    mercator[:, :, 1] = earthRad / 2 * \
+        np.log((1.0 + np.sin(a)) / (1.0 - np.sin(a)))
+    return mercator
 
-    polygon_buildings = buildings[buildings['geometry'].apply(
-        lambda r:type(r) == shapely.geometry.polygon.Polygon)]
-    multipolygon_buildings = buildings[buildings['geometry'].apply(
-        lambda r:type(r) == shapely.geometry.multipolygon.MultiPolygon)]
-    allbds = []
-    for j in range(len(multipolygon_buildings)):
-        r = multipolygon_buildings.iloc[j]
-        singlebd = gpd.GeoDataFrame()
-        singlebd['geometry'] = list(r['geometry'].geoms)
-        for i in r.index:
-            if i != 'geometry':
-                singlebd[i] = r[i]
-        allbds.append(singlebd)
-    allbds.append(polygon_buildings)
-    allbds = pd.concat(allbds)
-    allbds['building_id'] = range(len(allbds))
-    return allbds
+
+def mercator_lonlat(mercator):
+    lonlat = mercator.copy()
+    lonlat[0] = mercator[0]/20037508.34*180
+    temp = mercator[1]/20037508.34*180
+    lonlat[1] = 180/math.pi * \
+        (2*math.atan(math.exp(temp*math.pi/180)) - math.pi/2)  # 纬度的长度
+    return lonlat
+
+
+def mercator_lonlat_vector(mercator):
+    lonlat = np.zeros_like(mercator)
+    lonlat[:, :, 0] = mercator[:, :, 0]/20037508.34*180
+    lonlat[:, :, 1] = mercator[:, :, 1]/20037508.34*180
+    lonlat[:, :, 1] = 180/math.pi * \
+        (2*np.arctan(np.exp(lonlat[:, :, 1]*math.pi/180)) - math.pi/2)
+
+    return lonlat

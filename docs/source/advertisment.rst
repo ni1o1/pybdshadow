@@ -1,9 +1,9 @@
 .. _advertisment:
 
 
-******************************
-Billboard visual area
-******************************
+********************************************
+Advertisment billboard visual area
+********************************************
 
 Advertisment parameters
 --------------------------------------
@@ -60,3 +60,30 @@ visualArea : GeoDataFrame
     Visual Area of the advertisement
 shadows : GeoDataFrame
     Building shadows
+
+Optimize billboard parameters
+--------------------------------------
+
+.. function:: pybdshadow.ad_optimize(bounds,buildings,height_range=[0, 100],multiplier=[0.01, 0.001],printlog=True,size_pop=10,max_iter=30,prob_mut=0.001,precision=1e-7)
+
+Optimize advertisment parameters using Genetic Algorithm
+
+**Parameters**
+
+bounds : list
+    Area bounds, should be [lon1,lat1,lon2,lat2]
+buildings : GeoDataFrame
+    Buildings. coordinate system should be WGS84
+height_range : list
+    Height range of advertisment [minheight,maxheight]
+multiplier : list
+    Multiplier for orientation and height
+printlog : bool
+    Whether to print the optimization information of Genetic Algorithm
+size_pop,max_iter,prob_mut,precision :
+    Parameters of Genetic Algorithm
+
+**Return**
+
+ad_params : dict
+    Optimized advertisment parameters

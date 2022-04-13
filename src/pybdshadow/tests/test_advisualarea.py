@@ -1,5 +1,4 @@
 import pybdshadow
-import pandas as pd
 import numpy as np
 import geopandas as gpd
 from shapely.geometry import Polygon
@@ -9,7 +8,7 @@ class Testadvisualarea:
     def test_advisualarea(self):
         buildings = gpd.GeoDataFrame({
             'height': [42],
-            'building_id':1,
+            'building_id': 1,
             'geometry': [
                 Polygon([(139.714612, 35.551441),
                          (139.714616, 35.55144),
@@ -49,3 +48,14 @@ class Testadvisualarea:
                                  shadows=shadows,
                                  ad=billboard_gdf,
                                  ad_visualArea=visualArea)
+
+        #Define study area
+        bounds = [139.707846,35.543637,139.712567,35.549909]       
+        ad_params = pybdshadow.ad_optimize(bounds,
+                                   buildings,
+                                   height_range=[100,200],
+                                   printlog=True,
+                                   size_pop=2,
+                                   max_iter=1,
+                                   prob_mut=0.001,
+                                   precision=1e-7)
