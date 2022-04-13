@@ -38,7 +38,7 @@ billboard_height : number
 ad_gdf : GeoDataFrame
     advertisment GeoDataFrame
 
-visual area calculation
+Visual area calculation
 --------------------------------------
 
 .. function:: pybdshadow.ad_visualArea(ad_params, buildings=gpd.GeoDataFrame(), height='height')
