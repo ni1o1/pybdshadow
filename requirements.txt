@@ -3,3 +3,4 @@ geopandas
 matplotlib
 suncalc
 keplergl
+scikit-opt
