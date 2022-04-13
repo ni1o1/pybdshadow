@@ -403,10 +403,11 @@ Optimize advertisment parameters using Genetic Algorithm
 .. figure:: https://github.com/ni1o1/pybdshadow/blob/main/docs/source/example/output_ga.png?raw=true
    :alt: output_ga.png
 
+::
 
-{'orientation': 4.504880430224753,
- 'height': 109.41611234294162,
- 'brandCenter': [139.70883048898688, 35.550840354517774]}
+    {'orientation': 4.504880430224753,
+    'height': 109.41611234294162,
+    'brandCenter': [139.70883048898688, 35.550840354517774]}
 
 ::
 
