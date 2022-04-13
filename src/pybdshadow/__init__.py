@@ -53,13 +53,6 @@ from .visualization import (
 
 __all__ = ['bdshadow_sunlight',
            'bdshadow_pointlight',
-<<<<<<< Updated upstream
-           'ad_visualArea',
-           'ad_optimize',
-=======
->>>>>>> Stashed changes
            'bd_preprocess',
-           'merge_shadow',
-           'ad_to_gdf',
            'show_bdshadow',
            ]
