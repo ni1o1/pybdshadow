@@ -48,3 +48,14 @@ class Testadvisualarea:
                                  shadows=shadows,
                                  ad=billboard_gdf,
                                  ad_visualArea=visualArea)
+
+        #Define study area
+        bounds = [139.707846,35.543637,139.712567,35.549909]       
+        ad_params = pybdshadow.ad_optimize(bounds,
+                                   buildings,
+                                   height_range=[100,200],
+                                   printlog=True,
+                                   size_pop=2,
+                                   max_iter=1,
+                                   prob_mut=0.001,
+                                   precision=1e-7)
