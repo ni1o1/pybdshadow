@@ -62,5 +62,4 @@ Citation information can be found at https://github.com/ni1o1/pybdshadow/blob/ma
    
    preprocess.rst
    bdshadow.rst
-   advertisment.rst
    Visualization.rst

@@ -52,23 +52,17 @@ pybdshadow是什么？有什么用？提供了平行光源与点光源的建筑�
 目前pybdshadow提供了以下功能：
 
 - *Building Data Preprocess*:
-
 - *建筑阴影计算*: 包括平行光源与点光源
-
-- *广告可视区域分析*: 基于哪篇论文的方法，能够xxx
-
 - *Building 与阴影的可视化*: Built-in visualization capabilities leverage the visualization package `keplergl` to interactively visualize data in Jupyter notebooks with simple code.
 
+The target audience of `pybdshadow` includes:
 
-The target audience of `pybdshadow` includes: 
-1) Data science researchers and data engineers in the field of xxx, xxx, and urban computing, particularly those who want to xxx; 
-
+1) Data science researchers and data engineers in the field of xxx, xxx, and urban computing, particularly those who want to xxx;
 2) Government, enterprises, or other entities who expect xxx management decision support through xxx spatio-temporal data analysis.
 
 The latest stable release of the software can be installed via `pip` and full documentation
 can be found at https://pybdshadow.readthedocs.io/en/latest/.
 
-放三张效果图
-
+放两张效果图
 
 # References
