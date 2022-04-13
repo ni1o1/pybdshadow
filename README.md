@@ -57,43 +57,6 @@ pybdshadow.show_bdshadow(buildings = buildings,shadows = shadows)
 
 ![1649405838683.png](https://github.com/ni1o1/pybdshadow/raw/main/image/README/1649405838683.png)
 
-### Billboard visual area analyze
-
-To analyze billboard visual area, the parameter `ad_params` for the billboard should be defined. It has two forms:
-
-```python
-#1. Given the coordinates of brandCenter, orientation and height
-ad_params = {'orientation': 1.2806657381630058,
-            'height': 10,
-            'brandCenter': [139.71259, 35.552842999999996]} 
-#2. Given the coordinates of the two border points and height
-ad_params = {'point1': [139.711861, 35.552040],
-            'point2': [139.713319, 35.553646],#1861,3646
-            'height': 50,
-            }
-```
-
-We can calculate the visual area of the billboard using `ad_visualArea`.
-
-```python
-#calculate the visual area
-visualArea,shadows = pybdshadow.ad_visualArea(ad_params,buildings)
-```
-
-Then, visualize the billboard and the visual area.
-
-```python
-#Generate a GeoDataFrame from ad_params for visualization
-billboard_gdf = pybdshadow.ad_to_gdf(ad_params,billboard_height = 100)
-#Visualize buildings, shadows, billboard and visual area
-pybdshadow.show_bdshadow(buildings=buildings,
-                         shadows=shadows,
-                         ad=billboard_gdf,
-                         ad_visualArea=visualArea)
-```
-
-![1649406044109.png](https://github.com/ni1o1/pybdshadow/raw/main/image/README/1649406044109.png)
-
 ## Installation
 
 It is recommended to use `Python 3.7, 3.8, 3.9`
