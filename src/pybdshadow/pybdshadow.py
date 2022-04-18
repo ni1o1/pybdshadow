@@ -39,6 +39,7 @@ from .utils import (
     lonlat_mercator_vector,
     mercator_lonlat_vector
 )
+from .preprocess import gdf_difference,gdf_intersect
 
 
 def calSunShadow_vector(shape, shapeHeight, sunPosition):
@@ -76,7 +77,7 @@ def calSunShadow_vector(shape, shapeHeight, sunPosition):
     return shadowShape
 
 
-def bdshadow_sunlight(buildings, date,  height='height', roof=False, ground=0):
+def bdshadow_sunlight(buildings, date,  height='height', roof=False,include_building = True,ground=0):
     '''
     Calculate the sunlight shadow of the buildings.
 
@@ -89,6 +90,8 @@ def bdshadow_sunlight(buildings, date,  height='height', roof=False, ground=0):
         Column name of building height
     roof : bool
         whether to calculate the roof shadows
+    include_building : bool
+        whether the shadow include building outline
     ground : number
         Height of the ground
 
@@ -138,13 +141,16 @@ def bdshadow_sunlight(buildings, date,  height='height', roof=False, ground=0):
     ground_shadow['geometry'] = ground_shadow['geometry'].apply(
         lambda r: Polygon(r))
     ground_shadow = gpd.GeoDataFrame(ground_shadow)
-    ground_shadow = pd.concat([ground_shadow, building])
 
+
+
+    ground_shadow = pd.concat([ground_shadow, building])
     ground_shadow = ground_shadow.groupby(['building_id'])['geometry'].apply(
         lambda df: MultiPolygon(list(df)).buffer(0)).reset_index()
-    ground_shadow.crs = building.crs
+    
     ground_shadow['height'] = 0
     ground_shadow['type'] = 'ground'
+
     if not roof:
         return ground_shadow
     else:
@@ -186,45 +192,29 @@ def bdshadow_sunlight(buildings, date,  height='height', roof=False, ground=0):
                 building_shadow_height, building_roof)
             if len(building_shadow_height) == 0:
                 continue
-            # 做裁剪
-            building_roof['geometry'] = building_roof.intersection(
-                building_shadow_height.unary_union)
+            # 与屋顶做交集
+            building_roof = gdf_intersect(building_roof,building_shadow_height)
 
-            # 减去这个高度以上的建筑
+            # 再减去这个高度以上的建筑
             building_higher = building[building[height] > roof_height].copy()
-            building_roof['geometry'] = building_roof.difference(
-                building_higher.unary_union)
-
+            building_roof = gdf_difference(building_roof,building_higher)
+            
+            #给出高度信息
             building_roof['height'] = roof_height
             building_roof = building_roof[-building_roof['geometry'].is_empty]
 
             roof_shadows.append(building_roof)
 
-        roof_shadows = pd.concat(roof_shadows)[
+        roof_shadow = pd.concat(roof_shadows)[
             ['height', 'building_id', 'geometry']]
-        roof_shadows['type'] = 'roof'
+        roof_shadow['type'] = 'roof'
 
-        ''' #重叠的阴影
-        ground_shadow_intersect = pd.merge(
-            ground_shadow,roof_shadows['building_id'])
-        ground_shadow_intersect = ground_shadow_intersect.set_index(
-            'building_id').difference(
-                roof_shadows.sort_values(
-                    by = 'building_id').set_index('building_id'))
-        ground_shadow_intersect = ground_shadow_intersect[
-            -ground_shadow_intersect.isnull()]
-        ground_shadow_intersect = ground_shadow_intersect.reset_index()
-        ground_shadow_intersect['height'] = 0
-        ground_shadow_intersect.columns = ['building_id', 'geometry', 'height']
-        #没重叠的阴影
-        ground_shadow_notintersect = ground_shadow[
-            ground_shadow['building_id'].apply(
-                lambda r:r not in roof_shadows['building_id'])]
-        ground_shadow = pd.concat(
-            [ground_shadow_intersect,ground_shadow_notintersect])
-        '''
+        #从地面阴影裁剪建筑轮廓
+        ground_shadow = gdf_difference(ground_shadow,buildings)
 
-        shadows = pd.concat([roof_shadows, ground_shadow])
+        shadows = pd.concat([roof_shadow, ground_shadow])
+        shadows.crs = None
+        shadows['geometry'] = shadows.buffer(0.000001).buffer(-0.000001)
         return shadows
 
 
