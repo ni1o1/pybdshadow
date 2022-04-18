@@ -9,7 +9,7 @@ Building shadow
 Shadow from sunlight
 --------------------------------------
 
-.. function:: pybdshadow.bdshadow_sunlight(buildings, date, merge=False, height='height', ground=0)
+.. function:: pybdshadow.bdshadow_sunlight(buildings, date,  height='height', roof=False,include_building = True,ground=0)
 
 Calculate the sunlight shadow of the buildings.
 
@@ -19,10 +19,12 @@ buildings : GeoDataFrame
     Buildings. coordinate system should be WGS84
 date : datetime
     Datetime
-merge : bool
-    whether to merge the wall shadows into the building shadows
 height : string
     Column name of building height
+roof : bool
+    whether to calculate the roof shadows
+include_building : bool
+    whether the shadow include building outline
 ground : number
     Height of the ground
 

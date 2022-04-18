@@ -82,6 +82,7 @@ def bdshadow_sunlight(buildings, date,  height='height', roof=False,include_buil
     Calculate the sunlight shadow of the buildings.
 
     **Parameters**
+
     buildings : GeoDataFrame
         Buildings. coordinate system should be WGS84
     date : datetime
@@ -96,6 +97,7 @@ def bdshadow_sunlight(buildings, date,  height='height', roof=False,include_buil
         Height of the ground
 
     **Return**
+
     shadows : GeoDataFrame
         Building shadow
     '''
@@ -264,6 +266,7 @@ def bdshadow_pointlight(buildings,
     Calculate the sunlight shadow of the buildings.
 
     **Parameters**
+    
     buildings : GeoDataFrame
         Buildings. coordinate system should be WGS84
     pointlon,pointlat,pointheight : float
@@ -278,6 +281,7 @@ def bdshadow_pointlight(buildings,
         Height of the ground
 
     **Return**
+
     shadows : GeoDataFrame
         Building shadow
     '''
