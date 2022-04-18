@@ -152,6 +152,9 @@ def bdshadow_sunlight(buildings, date,  height='height', roof=False,include_buil
     ground_shadow['type'] = 'ground'
 
     if not roof:
+        if not include_building:
+            #从地面阴影裁剪建筑轮廓
+            ground_shadow = gdf_difference(ground_shadow,buildings)
         return ground_shadow
     else:
         def calwall_shadow(walldata, building):
@@ -204,14 +207,17 @@ def bdshadow_sunlight(buildings, date,  height='height', roof=False,include_buil
             building_roof = building_roof[-building_roof['geometry'].is_empty]
 
             roof_shadows.append(building_roof)
+        if len(roof_shadows) == 0:
+            roof_shadow = gpd.GeoDataFrame()
+        else:
+            roof_shadow = pd.concat(roof_shadows)[
+                ['height', 'building_id', 'geometry']]
+            roof_shadow['type'] = 'roof'
 
-        roof_shadow = pd.concat(roof_shadows)[
-            ['height', 'building_id', 'geometry']]
-        roof_shadow['type'] = 'roof'
-
-        #从地面阴影裁剪建筑轮廓
-        ground_shadow = gdf_difference(ground_shadow,buildings)
-
+        if not include_building:
+            #从地面阴影裁剪建筑轮廓
+            ground_shadow = gdf_difference(ground_shadow,buildings)
+        
         shadows = pd.concat([roof_shadow, ground_shadow])
         shadows.crs = None
         shadows['geometry'] = shadows.buffer(0.000001).buffer(-0.000001)
