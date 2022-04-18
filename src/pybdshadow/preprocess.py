@@ -71,3 +71,55 @@ def bd_preprocess(buildings, height='height'):
     allbds = pd.concat(allbds)
     allbds['building_id'] = range(len(allbds))
     return allbds
+
+def gdf_difference(gdf_a,gdf_b,col = 'building_id'):
+    '''
+    difference gdf_b from gdf_a
+    '''
+    gdfa = gdf_a.copy()
+    gdfb = gdf_b.copy()
+    gdfb = gdfb[['geometry']]
+    #判断重叠
+    from shapely.geometry import  MultiPolygon
+    gdfa.crs = gdfb.crs
+    gdfb = gpd.sjoin(gdfb,gdfa).groupby([col])['geometry'].apply(
+            lambda df: MultiPolygon(list(df)).buffer(0)).reset_index()
+    #分割有重叠和无重叠的
+    gdfb['tmp'] = 1
+    gdfa_1 = pd.merge(gdfa,gdfb[[col,'tmp']],how = 'left')
+    gdfa = gdfa_1[gdfa_1['tmp'] == 1].drop('tmp',axis = 1)
+    gdfa_notintersected = gdfa_1[gdfa_1['tmp'].isnull()].drop('tmp',axis = 1)
+    #对有重叠的进行裁剪
+    gdfa = gdfa.sort_values(by = col).set_index(col)
+    gdfb = gdfb.sort_values(by = col).set_index(col)
+    gdfa.crs = gdfb.crs
+    gdfa['geometry'] = gdfa.difference(gdfb)
+    gdfa = gdfa.reset_index()
+    #拼合
+    gdfa = pd.concat([gdfa,gdfa_notintersected])
+    return gdfa
+
+def gdf_intersect(gdf_a,gdf_b,col = 'building_id'):
+    '''
+    intersect gdf_b from gdf_a
+    '''
+    gdfa = gdf_a.copy()
+    gdfb = gdf_b.copy()
+    gdfb = gdfb[['geometry']]
+    #判断重叠
+    from shapely.geometry import  MultiPolygon
+    gdfa.crs = gdfb.crs
+    gdfb = gpd.sjoin(gdfb,gdfa).groupby([col])['geometry'].apply(
+            lambda df: MultiPolygon(list(df)).buffer(0)).reset_index()
+    #分割有重叠和无重叠的
+    gdfb['tmp'] = 1
+    gdfa_1 = pd.merge(gdfa,gdfb[[col,'tmp']],how = 'left')
+    gdfa = gdfa_1[gdfa_1['tmp'] == 1].drop('tmp',axis = 1)
+    #对有重叠的进行裁剪
+    gdfa = gdfa.sort_values(by = col).set_index(col)
+    gdfb = gdfb.sort_values(by = col).set_index(col)
+    gdfa.crs = gdfb.crs
+    gdfa['geometry'] = gdfa.intersection(gdfb)
+    gdfa = gdfa.reset_index()
+
+    return gdfa
