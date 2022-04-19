@@ -32,7 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import numpy as np
 import geopandas as gpd
-
+import pandas as pd
+from shapely.geometry import Polygon
 
 def show_bdshadow(buildings=gpd.GeoDataFrame(),
                   shadows=gpd.GeoDataFrame(),
@@ -218,6 +219,7 @@ def show_bdshadow(buildings=gpd.GeoDataFrame(),
         displaybuilding[height] = []
     else:
         vmapdata['building'] = displaybuilding
+
         layers.append({
             'id': 'lz48o3',
             'type': 'geojson',
@@ -256,7 +258,7 @@ def show_bdshadow(buildings=gpd.GeoDataFrame(),
                                 'sizeRange': [0, 10],
                                 'radiusRange': [0, 50],
                                 'heightRange': [0, 500],
-                                'elevationScale': 0.5,
+                                'elevationScale': 0.3,
                                 'enableElevationZoomFactor': True,
                                 'stroked': False,
                                 'filled': True,
