@@ -22,7 +22,7 @@ The buildings are usually store in the data as the form of Polygon object with `
 import pandas as pd
 import geopandas as gpd
 #Read building data
-buildings = gpd.read_file(r'data/bd_demo.json')
+buildings = gpd.read_file(r'data/bd_demo_2.json')
 ```
 
 Given a building GeoDataFrame and UTC datetime, `pybdshadow` can calculate the building shadow based on the sun position obtained by `suncalc`
@@ -30,7 +30,7 @@ Given a building GeoDataFrame and UTC datetime, `pybdshadow` can calculate the b
 ```python
 import pybdshadow
 #Given UTC datetime
-date = pd.to_datetime('2015-01-01 02:45:33.959797119')
+date = pd.to_datetime('2015-01-01 04:45:33.959797119')
 #Calculate building shadow for sun light
 shadows = pybdshadow.bdshadow_sunlight(buildings,date)
 ```
