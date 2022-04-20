@@ -30,7 +30,9 @@ Given a building GeoDataFrame and UTC datetime, `pybdshadow` can calculate the b
 ```python
 import pybdshadow
 #Given UTC datetime
-date = pd.to_datetime('2015-01-01 04:45:33.959797119')
+date = pd.to_datetime('2022-01-01 12:45:33.959797119')\
+    .tz_localize('Asia/Shanghai')\
+    .tz_convert('UTC')
 #Calculate building shadow for sun light
 shadows = pybdshadow.bdshadow_sunlight(buildings,date)
 ```
