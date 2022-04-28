@@ -50,6 +50,10 @@ from .preprocess import (
 from .visualization import (
     show_bdshadow,
 )
+from .analysis import (
+    cal_sunshadows,
+    cal_shadowduration
+)
 
 __all__ = ['bdshadow_sunlight',
            'bdshadow_pointlight',

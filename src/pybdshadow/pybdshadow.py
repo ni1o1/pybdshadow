@@ -332,7 +332,7 @@ def bdshadow_pointlight(buildings,
         #print(wallsBuilding)
 
     return [walls,wallsBuilding]
-
+''' 
 #=======================================================================================
 
 #Calculate building shadow for point light
@@ -558,3 +558,4 @@ def calVisibleArea(wall,pointLight):
     visibleShapes = calVisibleShape(shadow)  #计算可视面积
     visibleShapes['visibleShapes'] = visibleShapes.apply(lambda r: convert2To3(r),axis = 1)
     return visibleShapes['visibleShapes']
+ '''
