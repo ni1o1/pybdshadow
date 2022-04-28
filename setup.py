@@ -17,7 +17,7 @@ setuptools.setup(
         "Bug Tracker": "https://github.com/ni1o1/pybdshadow/issues",
     },
     install_requires=[
-        "numpy", "pandas", "shapely", "geopandas", "matplotlib","suncalc","keplergl"
+        "numpy", "pandas", "shapely", "geopandas", "matplotlib","suncalc","keplergl","transbigdata"
     ],
     classifiers=[
         "Operating System :: OS Independent",
