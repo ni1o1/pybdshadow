@@ -32,8 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import numpy as np
 import geopandas as gpd
-import pandas as pd
-from shapely.geometry import Polygon
 
 def show_bdshadow(buildings=gpd.GeoDataFrame(),
                   shadows=gpd.GeoDataFrame(),
