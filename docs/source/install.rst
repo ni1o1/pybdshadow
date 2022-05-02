@@ -31,3 +31,4 @@ Dependency
 * `matplotlib`
 * `suncalc`
 * `keplergl`
+* `TransBigData`
