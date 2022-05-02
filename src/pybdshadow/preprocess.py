@@ -34,7 +34,7 @@ import pandas as pd
 import geopandas as gpd
 
 
-def bd_preprocess(buildings, height='height'):
+def bd_preprocess(buildings, height=''):
     '''
     Preprocess building data, so that we can perform shadow calculation.
     Remove empty polygons and convert multipolygons into polygons.
@@ -50,9 +50,10 @@ def bd_preprocess(buildings, height='height'):
         Polygon buildings
     '''
     buildings = buildings[buildings.is_valid].copy()
-    # 建筑高度筛选
-    buildings[height] = pd.to_numeric(buildings[height], errors='coerce')
-    buildings = buildings[-buildings[height].isnull()].copy()
+    if height!='':
+        # 建筑高度筛选
+        buildings[height] = pd.to_numeric(buildings[height], errors='coerce')
+        buildings = buildings[buildings[height]>0].copy()
 
     polygon_buildings = buildings[buildings['geometry'].apply(
         lambda r:type(r) == shapely.geometry.polygon.Polygon)]
@@ -70,6 +71,7 @@ def bd_preprocess(buildings, height='height'):
     allbds.append(polygon_buildings)
     allbds = pd.concat(allbds)
     allbds['building_id'] = range(len(allbds))
+    allbds['geometry'] = allbds.buffer(0)
     return allbds
 
 def gdf_difference(gdf_a,gdf_b,col = 'building_id'):
@@ -93,7 +95,7 @@ def gdf_difference(gdf_a,gdf_b,col = 'building_id'):
     gdfa = gdfa.sort_values(by = col).set_index(col)
     gdfb = gdfb.sort_values(by = col).set_index(col)
     gdfa.crs = gdfb.crs
-    gdfa['geometry'] = gdfa.difference(gdfb)
+    gdfa['geometry'] = gdfa.difference(gdfb).buffer(0)
     gdfa = gdfa.reset_index()
     #拼合
     gdfa = pd.concat([gdfa,gdfa_notintersected])
@@ -119,7 +121,7 @@ def gdf_intersect(gdf_a,gdf_b,col = 'building_id'):
     gdfa = gdfa.sort_values(by = col).set_index(col)
     gdfb = gdfb.sort_values(by = col).set_index(col)
     gdfa.crs = gdfb.crs
-    gdfa['geometry'] = gdfa.intersection(gdfb)
+    gdfa['geometry'] = gdfa.intersection(gdfb).buffer(0)
     gdfa = gdfa.reset_index()
 
     return gdfa
