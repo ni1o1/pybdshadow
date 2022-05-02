@@ -194,7 +194,7 @@ def bdshadow_sunlight(buildings, date,  height='height', roof=False,include_buil
             building_shadow_height.crs = building_roof.crs
             # 取有遮挡的阴影
             building_shadow_height = gpd.sjoin(
-                building_shadow_height, building_roof)
+                gpd.GeoDataFrame(building_shadow_height), gpd.GeoDataFrame(building_roof))
             if len(building_shadow_height) == 0:
                 continue
             # 与屋顶做交集
