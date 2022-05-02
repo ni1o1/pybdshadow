@@ -65,7 +65,7 @@ pybdshadow.show_bdshadow(buildings = buildings,shadows = shadows)
 
 ![1651506285290.png](image/README/1651506285290.png)
 
-Base on this functionality, `pybdshadow` can also analysis shadow coverage on the roof and on the ground with high resolution. Detail usage can be found in [this example](https://github.com/ni1o1/pybdshadow/blob/main/example/example-analysis.ipynb).
+Base on this functionality, `pybdshadow` can also analysis shadow coverage on the roof and on the ground.  Detail usage can be found in [this example](https://github.com/ni1o1/pybdshadow/blob/main/example/example-analysis.ipynb).
 
 ![1651490411329.png](image/README/1651490411329.png)
 
