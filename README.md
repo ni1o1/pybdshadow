@@ -64,13 +64,13 @@ pybdshadow.show_bdshadow(buildings = buildings,shadows = shadows)
 
 ### Shadow coverage analysis
 
-`pybdshadow` also have the functionality to analysis the shadow coverage in given date:
+`pybdshadow` also have the functionality to analysis the shadow coverage in given date.
 Detail usage can be found in [this example](https://github.com/ni1o1/pybdshadow/blob/main/example/example-analysis.ipynb).
 
-Roof shadow:
+Result of shadow coverage
+
 ![1651490411329.png](image/README/1651490411329.png)
 
-Ground shadow:
 ![1651490416315.png](image/README/1651490416315.png)
 
 
