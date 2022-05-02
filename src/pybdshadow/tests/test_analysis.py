@@ -30,5 +30,5 @@ class Testanalysis:
         #分析
         date = '2022-01-01'
         shadows = pybdshadow.cal_sunshadows(buildings,dates = [date],gap=3600)
-        bdgrids = pybdshadow.cal_shadowduration(shadows,buildings,gap = 3600,accuracy=2)
+        bdgrids = pybdshadow.cal_shadowcoverage(shadows,buildings,gap = 3600,accuracy=2)
         assert len(bdgrids)==1185

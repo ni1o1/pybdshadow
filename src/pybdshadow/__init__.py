@@ -32,7 +32,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-__version__ = '0.2.4'
+__version__ = '0.3.0'
 __author__ = 'Qing Yu <qingyu0815@foxmail.com>'
 
 # module level doc-string
@@ -52,11 +52,13 @@ from .visualization import (
 )
 from .analysis import (
     cal_sunshadows,
-    cal_shadowduration
+    cal_shadowcoverage
 )
 
 __all__ = ['bdshadow_sunlight',
            'bdshadow_pointlight',
            'bd_preprocess',
            'show_bdshadow',
+           'cal_sunshadows',
+           'cal_shadowcoverage',
            ]
