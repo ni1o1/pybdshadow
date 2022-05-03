@@ -2,11 +2,11 @@
 
 
 *****************************
-Shadow coverage analysis
+Shadow coverage
 *****************************
 
 
-Shadow coverage analysis
+Shadow coverage
 --------------------------------------
 
 .. function:: pybdshadow.cal_sunshadows(buildings, cityname='somecity', dates=['2022-01-01'], gap=3600,roof=True, include_building=True,save_shadows=False,printlog=False)
