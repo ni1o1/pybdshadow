@@ -24,7 +24,8 @@ affiliations:
 date: 30 April 2022
 bibliography: paper.bib
 ---
-# Summary
+
+# Introduction
 
 背景，城市数字孪生的趋势出现。
 
@@ -52,30 +53,14 @@ ArcGIS中的Hillshade工具可以进行栅格数据的阴影检测，而在实�
 
 # Statement of need
 
-pybdshadow是什么？有什么用？提供了平行光源与点光源的建筑阴影向量化计算方法，能够xxx。
 
-同时，pybdshadow也提供了基于阴影数据做进一步应用的方法，如广告可视区域计算，广告优化选址等。
-
-目前pybdshadow提供了以下功能：
-
-- *Building Data Preprocess*:
-- *建筑阴影计算*: 包括平行光源与点光源
-- *Building 与阴影的可视化*: Built-in visualization capabilities leverage the visualization package `keplergl` to interactively visualize data in Jupyter notebooks with simple code.
-
-The target audience of `pybdshadow` includes:
-
-1) Data science researchers and data engineers in the field of xxx, xxx, and urban computing, particularly those who want to xxx;
-2) Government, enterprises, or other entities who expect xxx management decision support through xxx spatio-temporal data analysis.
 
 pybdshadow是一个可以对大数据矢量类型的建筑物进行阴影计算的库，提供了平行光源与点光源的建筑阴影向量化计算方法，针对地理矢量建筑数据在不同光源类型及光源位置下的阴影分析及显示。实现数据处理、阴影计算、可视化的集成效果。
 目前pybdshadow提供了以下功能：
-•	Building Data Preprocess:将用户输入的数据处理成所需要的geopandas格式。
-•	建筑阴影计算: 包括平行光源与点光源
-•	平行光源：根据用户输入的经纬度及时间利用suncalc库计算太阳方位角及高度角，利用太阳角度信息推算阴影位置。
-•	点光源：用户输入一个三维坐标，计算在该点光源下的投影
-•	Building 与阴影的可视化: Built-in visualization capabilities leverage the visualization package keplergl to interactively visualize data in Jupyter notebooks with simple code.(\autoref{fig:fig1})
-
-(\autoref{fig:fig2})
+•	Preprocess:将用户输入的数据处理成所需要的geopandas格式。Building Data 
+•	Calculation: 包括平行光源与点光源。平行光源：根据用户输入的经纬度及时间利用suncalc库计算太阳方位角及高度角，利用太阳角度信息推算阴影位置。点光源：用户输入一个三维坐标，计算在该点光源下的投影
+•	Analysis: 基于`TransBigData` 提供了分析的功能[@Yu2022](\autoref{fig:fig2})
+•	Visualization: Built-in visualization capabilities leverage the visualization package `keplergl` to interactively visualize data in Jupyter notebooks with simple code.(\autoref{fig:fig1})
 
 The target audience of `pybdshadow` includes:
 
