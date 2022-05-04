@@ -1,5 +1,6 @@
 ---
 title: 'pybdshadow: A python package for generating, analyzing and visualizing building shadows'
+title: 'pybdshadow: a python package for generating, analyzing and visualizing building shadows'
 tags:
   - Python
   - GIS
@@ -34,7 +35,6 @@ Building shadows, as one of the significant elements in urban DT, have an impact
 Therefore, there is an urgent need for a tool to generate building shadows from building data and provide corresponding analyzing methods. Such tool can provide brand new and valuable data source for supporting the field of urban studies. 
 
 # State of the art
-
 
 Building shadows have been shown to affect local surface temperature in metropolitan environments, which will generate thermal influence to the greenery, water, and impervious structures on the urban heat island[@DAI201977-3; @PARK2021101655-4].
 
@@ -88,6 +88,7 @@ The latest stable release of the software can be installed via `pip` and full do
 ![pybdshadow generate and visualize building shadows.\label{fig:fig1}](image/paper/1651656857394.png){ width=100% }
 
 ![pybdshadow analyse sunshine time both on the roof and on the ground.\label{fig:fig2}](image/paper/1651656639873.png){ width=100% }
+![pybdshadow analyse sunshine time on the building roof and on the ground.\label{fig:fig2}](image/paper/1651656639873.png){ width=100% }
 
 # References
 
