@@ -1,5 +1,5 @@
 ---
-title: 'pybdshadow: A python package for building shadow calculation, analysis and visualization'
+title: 'pybdshadow: A python package for generating, analyzing and visualizing building shadows'
 tags:
   - Python
   - GIS
@@ -24,26 +24,23 @@ affiliations:
 date: 30 April 2022
 bibliography: paper.bib
 ---
-# Summary
 
+# Summary
 
 In recent years, the digital twin (DT) technology is a rapidly developing research area, however it is still in its early stages[@9267879-1; @9254288-2]. An urban DT is a digital version of a smart city that may be used to simulate and visualize real-world events in an urban setting. It's often portrayed as interactive platforms that can capture and show real-time 3D spatio-temporal data in order to simulate urban environments and data flows.
 
-With the development of remote sensing technology, researchers are able to obtain large-scale building data within the urban area, and the availability of these data is of great importance for the study of urban building shadows[citation needed]. Building shadows, as one of the most important elements in urban environments, have an impact on a variety of features of the urban environment. 
+Building shadows, as one of the significant elements in urban DT, have an impact on a variety of features of the urban environment. With the development of remote sensing, photogrammetry and deep learning technology, researchers are able to obtain city-scale building data with high resolution. These newly emerged building data provides an available data source for generating and analyzing building shadows[citation needed]. 
 
-研究表明，建筑物阴影对城区局部地表温度存在一定的影响[@DAI201977-3]，并进一步作用于城市热岛[@PARK2021101655-4]；近些年开始飞速发展的光伏新能源发电也受到建筑物遮光的影响，建筑的阴影会降低光伏系统的生电效率[@WU2021116884-5]，同时，研究建筑物阴影分布有利于寻找最佳的光伏板位置[@YADAV201811-6]，实现最大收益的光能利用。
-阴影可以作为环境的一部分对其产生影响，另一方面，建筑阴影也可以作为建筑的一种属性还原城市环境中的建筑物[7]；此外，建筑物阴影也在城市区域规划[8]、噪声传播（广义阴影）[@bolin2020investigation-9]、灾后建筑重建等方面有着重要的作用。而随着摄影测量及深度学习等技术的发展，建筑轮廓数据的快速且便利地获取[?]为我们分析在光照作用下的阴影位置提供了机会。
-
-对建筑阴影数据的分析具有重要的研究意义，因此，
-There is an urgent need for a tool
-从建筑数据中计算阴影，对阴影进行分析与可视化的工具具有
-package for building shadow calculation, analysis and visualization
-
-
-也因此
-
+Therefore, there is an urgent need for a tool to generate building shadows from building data and provide corresponding analyzing methods. Such tool can provide brand new and valuable data source for supporting the field of urban studies. 
 
 # State of the art
+
+
+Building shadows have been shown to affect local surface temperature in metropolitan environments, which will generate thermal influence to the greenery, water, and impervious structures on the urban heat island[@DAI201977-3; @PARK2021101655-4].
+
+In the field of photovoltaic(PV), building integrated PV systems are expected to disseminate due to effective use of urban space. Researchers also focus on the power output performance affected by the shading of buildings[@WU2021116884-5]. Study of the spatial-temporal distribution of building shadow is conducive  in determining the best location for photovoltaic panels to maximize energy generation[@YADAV201811-6].
+
+In addition, building shadows also play a significant role in the field of urban planning, noise propagation[@bolin2020investigation-9], and post-disaster building rehabilitation.
 
 相关研究：
 利用阴影数据进行的研究有哪些？分别有什么应用？
@@ -55,9 +52,15 @@ package for building shadow calculation, analysis and visualization
 
 缺乏一个能够兼容Python数据处理处理体系、且支持向量化快速计算（像pybdshadow这样）的工具
 
+
+
 在遥感及图像处理领域，研究者们通过光谱信息结合空间信息处理建筑物等阴影造成的信息缺失或损耗。通常的研究手段是将建筑阴影与其它地物类型分离，其本质还是二维的图像分类。
-(Guoqing Zhou)的文章提出了一种将二维的图像处理与三维的建筑投影结合的方法（DBM）获取图像中的建筑阴影[@zhou2015integrated-10; @rs12040679-11]，[@RAFIEE2014397-12]开发出一种基于建筑信息模型（BIM）与地理信息系统（GIS）的建筑阴影分析脚本用于分析室内光照；[@HONG2016408-13]利用经典的阴影分析法Hillshade计算可用的屋顶光伏面积。Fabio Miranda等人利用光线追踪阴影技术计算长时间的阴影累计[@8283638-14]，然而光线追踪虽然能获得符合人眼视觉的漂亮真实的阴影效果，但是无法获取阴影区域坐标进行机理层面的分析。
+
+(Guoqing Zhou)的文章提出了一种将二维的图像处理与三维的建筑投影结合的方法（DBM）获取图像中的建筑阴影[@zhou2015integrated-10; @rs12040679-11]，[@RAFIEE2014397-12]开发出一种基于建筑信息模型（BIM）与地理信息系统（GIS）的建筑阴影分析脚本用于分析室内光照；[@HONG2016408-13]利用经典的阴影分析法Hillshade计算可用的屋顶光伏面积。
+
+Fabio Miranda等人利用光线追踪阴影技术计算长时间的阴影累计[@8283638-14]，然而光线追踪虽然能获得符合人眼视觉的漂亮真实的阴影效果，但是无法获取阴影区域坐标进行机理层面的分析。
 ArcGIS中的Hillshade工具可以进行栅格数据的阴影检测，而在实际应用中，建筑物通常以矢量形式存储，存储形式的转变往往会伴随着信息的损失。
+
 因此，目前为止，针对建筑物阴影的研究虽然较多，但是缺乏一个能够兼容Python数据处理处理体系、且支持向量化快速计算（像pybdshadow这样）的工具。
 
 在Python中，依托geopandas包我们可以很方便地实现空间数据的计算，也有大量工具能够支撑我们进行科学分析计算
@@ -82,9 +85,9 @@ The target audience of `pybdshadow` includes:
 
 The latest stable release of the software can be installed via `pip` and full documentation can be found at https://pybdshadow.readthedocs.io/en/latest/.
 
-![pybdshadow</code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code> generate and visualize building shadows.\label{fig:fig1}](image/paper/1651656857394.png){ width=100% }
+![pybdshadow generate and visualize building shadows.\label{fig:fig1}](image/paper/1651656857394.png){ width=100% }
 
-![pybdshadow</code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code></code> analyse sunshine time both on the roof and on the ground.\label{fig:fig2}](image/paper/1651656639873.png){ width=100% }
+![pybdshadow analyse sunshine time both on the roof and on the ground.\label{fig:fig2}](image/paper/1651656639873.png){ width=100% }
 
 # References
 
