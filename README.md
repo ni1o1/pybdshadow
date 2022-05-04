@@ -59,19 +59,19 @@ pybdshadow.show_bdshadow(buildings = buildings,shadows = shadows)
 
 ![1649405838683.png](https://github.com/ni1o1/pybdshadow/raw/main/image/README/1649405838683_1.png)
 
-### Shadow coverage analysis
+### Shadow coverage analysis(sunshine time)
 
 `pybdshadow` also have the functionality to calculate the shadow on the roof.
 
 ![1651506285290.png](image/README/1651506285290.png)
 
-Base on this functionality, `pybdshadow` can also analysis shadow coverage on the roof and on the ground. Detail usage can be found in [this example](https://github.com/ni1o1/pybdshadow/blob/main/example/example-analysis.ipynb).
+Base on this functionality, `pybdshadow` can also analysis sunshine time on the roof and on the ground. Detail usage can be found in [this example](https://github.com/ni1o1/pybdshadow/blob/main/example/example-analysis.ipynb).
 
-![1651490411329.png](image/README/1651490411329.png)
+![1651645524782.png](image/README/1651645524782.png)
 
 Result of shadow coverage on the roof.
 
-![1651490416315.png](image/README/1651490416315.png)
+![1651645530892.png](image/README/1651645530892.png)
 
 Result of shadow coverage on the ground.
 
