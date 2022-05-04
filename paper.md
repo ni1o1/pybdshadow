@@ -1,5 +1,4 @@
 ---
-title: 'pybdshadow: A python package for generating, analyzing and visualizing building shadows'
 title: 'pybdshadow: a python package for generating, analyzing and visualizing building shadows'
 tags:
   - Python
@@ -87,7 +86,6 @@ The latest stable release of the software can be installed via `pip` and full do
 
 ![pybdshadow generate and visualize building shadows.\label{fig:fig1}](image/paper/1651656857394.png){ width=100% }
 
-![pybdshadow analyse sunshine time both on the roof and on the ground.\label{fig:fig2}](image/paper/1651656639873.png){ width=100% }
 ![pybdshadow analyse sunshine time on the building roof and on the ground.\label{fig:fig2}](image/paper/1651656639873.png){ width=100% }
 
 # References
