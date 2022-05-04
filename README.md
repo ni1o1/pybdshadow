@@ -1,4 +1,4 @@
-# pybdshadow - A python package for generating, analyzing and visualizing building shadows
+# pybdshadow 
 
 ![1649074615552.png](https://github.com/ni1o1/pybdshadow/raw/main/image/README/1649074615552.png)
 
@@ -6,7 +6,7 @@
 
 ## Introduction
 
-`pybdshadow` is a python package to analyze building shadow.
+`pybdshadow` is a python package for generating, analyzing and visualizing building shadows.
 The latest stable release of the software can be installed via pip and full documentation can be found [here](https://pybdshadow.readthedocs.io/en/latest/).
 
 ## Example
