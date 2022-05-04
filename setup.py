@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="pybdshadow",
-    version="0.3.0",
+    version="0.3.1",
     author="Qing Yu",
     author_email="qingyu0815@foxmail.com",
     description="Python package to generate building shadow geometry",
