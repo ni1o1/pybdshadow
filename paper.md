@@ -14,12 +14,12 @@ authors:
     orcid: 0000-0003-2513-2969
     affiliation: 1
   - name: Ge Li
-    orcid: 需补充
+    orcid: 0000-0002-5761-7269
     affiliation: 2
 affiliations:
  - name: Key Laboratory of Road and Traffic Engineering of the Ministry of Education, Tongji University, 4800 Cao’an Road, Shanghai 201804, People’s Republic of China
    index: 1
- - name: 需补充
+ - name: School of Geography and Information Engineering, China University of Geosciences (Wuhan), Wuhan 430074, People’s Republic of China
    index: 2
 date: 30 April 2022
 bibliography: paper.bib
