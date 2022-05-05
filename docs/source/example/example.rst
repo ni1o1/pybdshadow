@@ -1,6 +1,8 @@
 Building shadow analysis
 ==============================
 
+Notebook for this example: `here <https://github.com/ni1o1/pybdshadow/blob/main/example/Example1-building_shadow_analysis.ipynb>`__.
+
 In this example, we will introduce how to use ``pybdshadow`` to
 generate, analyze and visualize the building shadow data
 
