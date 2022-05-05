@@ -27,60 +27,29 @@ bibliography: paper.bib
 
 # Summary
 
-In recent years, the digital twin (DT) technology is a rapidly developing research area, however it is still in its early stages[@9267879-1; @9254288-2]. An urban DT is a digital version of a smart city that may be used to simulate and visualize real-world events in an urban setting. It's often portrayed as interactive platforms that can capture and show real-time 3D spatio-temporal data in order to simulate urban environments and data flows.
+Building shadows, as one of the significant elements in urban area, have an impact on a variety of features of the urban environment. Building shadows have been shown to affect local surface temperature in metropolitan environments, which will generate thermal influence to the greenery, water, and impervious structures on the urban heat island[@DAI201977-3; @PARK2021101655-4]. In the field of photovoltaic(PV), building integrated PV systems are expected to disseminate due to effective use of urban space. Researchers also focus on the power output performance affected by the shading of buildings[@WU2021116884-5]. Study of the spatial-temporal distribution of building shadow is conducive  in determining the best location for photovoltaic panels to maximize energy generation[@YADAV201811-6]. In addition, building shadows also play a significant role in the field of urban planning[@RAFIEE2014397-12], noise propagation[@bolin2020investigation-9], and post-disaster building rehabilitation[@rs13163297].
 
-Building shadows, as one of the significant elements in urban DT, have an impact on a variety of features of the urban environment. With the development of remote sensing, photogrammetry and deep learning technology, researchers are able to obtain city-scale building data with high resolution. These newly emerged building data provides an available data source for generating and analyzing building shadows[citation needed]. 
+With the development of remote sensing, photogrammetry and deep learning technology, researchers are able to obtain city-scale building data with high resolution. These newly emerged building data provides an available data source for generating and analyzing building shadows[@CHEN2020114-8]. 
 
-Therefore, there is an urgent need for a tool to generate building shadows from building data and provide corresponding analyzing methods. Such tool can provide brand new and valuable data source for supporting the field of urban studies. 
-
-更新后：
-数字时代，互联网技术的革新催生了“数字孪生城市”（DT）趋势的出现[1]。 “数字孪生城市”的广泛应用又同时促进了相关领域的发展[2]。而对城市的研究绕不开城市的主体组件——建筑物，研究表明，建筑物阴影对城区局部地表温度存在一定的影响[3]，并进一步作用于城市热岛[4]；近些年开始飞速发展的光伏新能源发电也受到建筑物遮光的影响，建筑的阴影会降低光伏系统的生电效率[5]，同时，研究建筑物阴影分布有利于寻找最佳的光伏板位置[6]，实现最大收益的光能利用。
-阴影可以作为环境的一部分对其产生影响，另一方面，建筑阴影也可以作为建筑的一种属性还原城市环境中的建筑物[7]；此外，建筑物阴影也在城市区域规划[8]、噪声传播（广义阴影）[9]、灾后建筑重建等方面有着重要的作用。而随着摄影测量及深度学习等技术的发展，建筑轮廓数据的快速且便利地获取[10]为我们分析在光照作用下的阴影位置提供了机会。
-
+`pybdshadow` is a Python package to generate building shadows from building data and provide corresponding methods to analyze the changing position of shadows. `pybdshadow` can provide brand new and valuable data source for supporting the field of urban studies. 
 
 # State of the art
 
-Building shadows have been shown to affect local surface temperature in metropolitan environments, which will generate thermal influence to the greenery, water, and impervious structures on the urban heat island[@DAI201977-3; @PARK2021101655-4].
+Existing methods of generating and detecting building shadows can be devided into two major ways: Remote sensing and BIM/GIS analysis.
 
-In the field of photovoltaic(PV), building integrated PV systems are expected to disseminate due to effective use of urban space. Researchers also focus on the power output performance affected by the shading of buildings[@WU2021116884-5]. Study of the spatial-temporal distribution of building shadow is conducive  in determining the best location for photovoltaic panels to maximize energy generation[@YADAV201811-6].
+- Remote sensing: In the field of remote sensing and satellite image processing, researchers examine shadow information from remote sensing images by identifying and distinguishing building shadows from other objects[@rs13152862-7].
+Zhou et al. developed a shadow detection method by combining the zero-crossing detection method with the DBM-based geometric method to identify shadow from high-resolution images[@zhou2015integrated-10; @rs12040679-11].
+- BIM/GIS analysis: Another way of obtaining building shadow is to transform Building Information Model(BIM) to its corresponding geo-located model[@RAFIEE2014397-12]. The Hillshade function provided in ArcGIS is capable of producing a grayscale 3D representation of the terrain surface, which can be used as a tool for analysing building shadow. Hong et al. analyze the building shadow using Hillshade Analysis and estimate the available rooftop area for PV System[@HONG2016408-13]. Miranda et al. propose an approach that uses the properties of sun movement to track the changing position of shadows within a fixed time interval[@8283638-14].
 
-In addition, building shadows also play a significant role in the field of urban planning, noise propagation[@bolin2020investigation-9], and post-disaster building rehabilitation.
-
-相关研究：
-利用阴影数据进行的研究有哪些？分别有什么应用？
-
-计算方法：
-已有的阴影计算方法有哪些？有什么工具？
-
-总结：
-
-缺乏一个能够兼容Python数据处理处理体系、且支持向量化快速计算（像pybdshadow这样）的工具
-
-
-
-在遥感及图像处理领域，研究者们通过光谱信息结合空间信息处理建筑物等阴影造成的信息缺失或损耗。通常的研究手段是将建筑阴影与其它地物类型分离，其本质还是二维的图像分类。
-
-(Guoqing Zhou)的文章提出了一种将二维的图像处理与三维的建筑投影结合的方法（DBM）获取图像中的建筑阴影[@zhou2015integrated-10; @rs12040679-11]，[@RAFIEE2014397-12]开发出一种基于建筑信息模型（BIM）与地理信息系统（GIS）的建筑阴影分析脚本用于分析室内光照；[@HONG2016408-13]利用经典的阴影分析法Hillshade计算可用的屋顶光伏面积。
-
-Fabio Miranda等人利用光线追踪阴影技术计算长时间的阴影累计[@8283638-14]，然而光线追踪虽然能获得符合人眼视觉的漂亮真实的阴影效果，但是无法获取阴影区域坐标进行机理层面的分析。
-ArcGIS中的Hillshade工具可以进行栅格数据的阴影检测，而在实际应用中，建筑物通常以矢量形式存储，存储形式的转变往往会伴随着信息的损失。
-
-因此，目前为止，针对建筑物阴影的研究虽然较多，但是缺乏一个能够兼容Python数据处理处理体系、且支持向量化快速计算（像pybdshadow这样）的工具。
-
-在Python中，依托geopandas包我们可以很方便地实现空间数据的计算，也有大量工具能够支撑我们进行科学分析计算
-
-更新后：
-在遥感及图像处理领域，研究者们通过光谱信息结合空间信息处理建筑物等阴影造成的信息缺失或损耗。通常的研究手段是将建筑阴影与其它地物类型分离，其本质还是二维的图像分类。
-(Guoqing Zhou)的文章提出了一种将二维的图像处理与三维的建筑投影结合的方法（DBM）获取图像中的建筑阴影[11,12]，[13]开发出一种基于建筑信息模型（BIM）与地理信息系统（GIS）的建筑阴影分析脚本用于分析室内光照；[14]利用经典的阴影分析法Hillshade计算可用的屋顶光伏面积。Fabio Miranda等人利用光线追踪阴影技术计算长时间的阴影累计[15]，然而光线追踪虽然能获得符合人眼视觉的漂亮真实的阴影效果，但是无法获取阴影区域坐标进行机理层面的分析。
-ArcGIS中的Hillshade工具可以进行栅格数据的阴影检测，而在实际应用中，建筑物通常以矢量形式存储，存储形式的转变往往会伴随着信息的损失。
-	因此，目前为止，针对建筑物阴影的研究虽然较多，但是缺乏一个能够兼容Python数据处理处理体系、且支持向量化快速计算（像pybdshadow这样）的工具。
-
-
+In Python environment, geospatial analysing package like `geopandas`, `turfpy`, `PySAL` provide tools to easily implement the spatial analysis of spatial data. Nevertheless, there is a lack of an effective tool for generating and analyzing building shadows that is compatible with the Python data processing framework.
 
 # Statement of need
 
-pybdshadow是一个可以对大数据矢量类型的建筑物进行阴影计算的库，提供了平行光源与点光源的建筑阴影向量化计算方法，针对地理矢量建筑数据在不同光源类型及光源位置下的阴影分析及显示。实现数据处理、阴影计算、可视化的集成效果。
+pybdshadow is a python package for generating, analyzing and visualizing building shadows.
 
+提供了平行光源与点光源的建筑阴影向量化计算方法，针对地理矢量建筑数据在不同光源类型及光源位置下的阴影分析及显示。实现数据处理、阴影计算、可视化的集成效果。
+
+`pybdshadow` presents an important new source of geospatial network data
 目前pybdshadow提供了以下功能：
 
 - Preprocess:将用户输入的数据处理成所需要的geopandas格式。Building Data
@@ -102,40 +71,4 @@ The latest stable release of the software can be installed via `pip` and full do
 
 # References
 
-[1] Digital Twin of City: Concept Overview
-[2] Digital Transformation Revolution with Digital Twin Technology
-[3] Dai, Z., Guldmann, J. M., & Hu, Y. (2019). Thermal impacts of greenery, water, and impervious structures in Beijing’s Olympic area: A spatial regression approach. Ecological Indicators, 97, 77–88
-[4] Impacts of tree and building shades on the urban heat island: Combining remote sensing, 3D digital city and spatial regression approaches
-[5] Coupled optical-electrical-thermal analysis of a semi-transparent photovoltaic glazing façade under building shadow
-[6] Performance of building integrated photovoltaic thermal system with PV 1 module installed at optimum tilt angle and influenced by shadow
-[7] Introduction of the mean shift algorithm in SAR imagery: Application to shadow extraction for building reconstruction
-[8] ANALYSIS OF BUILDING SHADOW IN URBAN PLANNING: A REVIEW
-[9] An investigation of the influence of the refractive shadow zone on wind turbine noise
-ürker, M.; Sümer, E. Building-based damage detection due to earthquake using the watershed segmentation
-of the post-event aerial images. Int. J. Remote Sens. 2008, 29, 3073–3089. [CrossRef]
-[10] An integrated approach for shadow detection of the building in urban areas
-[11] Building Shadow Detection on Ghost Images
-[12] From BIM to geo-analysis: view coverage and shadow analysis by BIM/GIS integration
-[13] Estimation of the available rooftop area for installing the rooftop solar photovoltaic (PV) system by analyzing the building shadow using Hillshade analysis
-[13] Three-Dimensional Rule-Based City Modelling to Support Urban Redevelopment Process
-[14] Shadow Accrual Maps: Efficient Accumulation of City-Scale Shadows Over Time
-
-更新后：
-[1] Digital Twin of City: Concept Overview
-[2] Digital Transformation Revolution with Digital Twin Technology
-[3] Dai, Z., Guldmann, J. M., & Hu, Y. (2019). Thermal impacts of greenery, water, and impervious structures in Beijing’s Olympic area: A spatial regression approach. Ecological Indicators, 97, 77–88
-[4] Impacts of tree and building shades on the urban heat island: Combining remote sensing, 3D digital city and spatial regression approaches
-[5] Coupled optical-electrical-thermal analysis of a semi-transparent photovoltaic glazing façade under building shadow
-[6] Performance of building integrated photovoltaic thermal system with PV 1 module installed at optimum tilt angle and influenced by shadow
-[7] Multi-Scene Building Height Estimation Method Based on Shadow in High Resolution Imagery
-[8] From BIM to geo-analysis: view coverage and shadow analysis by BIM/GIS integration
-[9] An investigation of the influence of the refractive shadow zone on wind turbine noise
-ürker, M.; Sümer, E. Building-based damage detection due to earthquake using the watershed segmentation
-of the post-event aerial images. Int. J. Remote Sens. 2008, 29, 3073–3089. [CrossRef]
-[10] An end-to-end shape modeling framework for vectorized building outline generation from aerial images
-[11] An integrated approach for shadow detection of the building in urban areas
-[12] Building Shadow Detection on Ghost Images
-[13] Three-Dimensional Rule-Based City Modelling to Support Urban Redevelopment Process
-[14] Estimation of the available rooftop area for installing the rooftop solar photovoltaic (PV) system by analyzing the building shadow using Hillshade analysis
-[15] Shadow Accrual Maps: Efficient Accumulation of City-Scale Shadows Over Time
 

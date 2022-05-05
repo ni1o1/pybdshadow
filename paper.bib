@@ -74,6 +74,37 @@ keywords = {BIPV thermal system, Optimum tilt angle, HDKR model, Energy equilibr
 abstract = {Building integrated photovoltaic (BIPV) thermal system is an efficient system for urban applications to convert a building to net zero energy buildings by utilizing solar insolation. In this study, HDKR/S (Hay, Davies, Klucher, Reindl/shadow) model is developed which is a modified HDKR model where influence of shadow is incorporated in the mathematical model. Four discrete rectangular buildings situated in four directions (North, South, East and West) around a BIPV thermal system are considered for creating adverse effect of shadow. Variation of width (B), storey height (H) and horizontal distance (D) of these surrounded buildings are taken into account for evaluating optimum tilt angle, insolation and performance of BIPV thermal system by introducing corresponding shadow effects. The performance of the system is adversely affected because of the presence of surrounded building located at close proximity i.e., due to higher influence of shading and sky view blocking effects.}
 }
 
+
+@Article{rs13152862-7,
+AUTHOR = {Xie, Yakun and Feng, Dejun and Xiong, Sifan and Zhu, Jun and Liu, Yangge},
+TITLE = {Multi-Scene Building Height Estimation Method Based on Shadow in High Resolution Imagery},
+JOURNAL = {Remote Sensing},
+VOLUME = {13},
+YEAR = {2021},
+NUMBER = {15},
+ARTICLE-NUMBER = {2862},
+URL = {https://www.mdpi.com/2072-4292/13/15/2862},
+ISSN = {2072-4292},
+ABSTRACT = {Accurately building height estimation from remote sensing imagery is an important and challenging task. However, the existing shadow-based building height estimation methods have large errors due to the complex environment in remote sensing imagery. In this paper, we propose a multi-scene building height estimation method based on shadow in high resolution imagery. First, the shadow of building is classified and described by analyzing the features of building shadow in remote sensing imagery. Second, a variety of shadow-based building height estimation models is established in different scenes. In addition, a method of shadow regularization extraction is proposed, which can solve the problem of mutual adhesion shadows in dense building areas effectively. Finally, we propose a method for shadow length calculation combines with the fish net and the pauta criterion, which means that the large error caused by the complex shape of building shadow can be avoided. Multi-scene areas are selected for experimental analysis to prove the validity of our method. The experiment results show that the accuracy rate is as high as 96% within 2 m of absolute error of our method. In addition, we compared our proposed approach with the existing methods, and the results show that the absolute error of our method are reduced by 1.24 m–3.76 m, which can achieve high-precision estimation of building height.},
+DOI = {10.3390/rs13152862}
+}
+
+
+@article{CHEN2020114-8,
+title = {An end-to-end shape modeling framework for vectorized building outline generation from aerial images},
+journal = {ISPRS Journal of Photogrammetry and Remote Sensing},
+volume = {170},
+pages = {114-126},
+year = {2020},
+issn = {0924-2716},
+doi = {https://doi.org/10.1016/j.isprsjprs.2020.10.008},
+url = {https://www.sciencedirect.com/science/article/pii/S092427162030280X},
+author = {Qi Chen and Lei Wang and Steven L. Waslander and Xiuguo Liu},
+keywords = {Building segmentation, Boundary optimization, Automatic mapping, Deep learning, Shape modeling},
+abstract = {The identification and annotation of buildings has long been a tedious and expensive part of high-precision vector map production. The deep learning techniques such as fully convolution network (FCN) have largely promoted the accuracy of automatic building segmentation from remote sensing images. However, compared with the deep-learning-based building segmentation methods that greatly benefit from data-driven feature learning, the building boundary vector representation generation techniques mainly rely on handcrafted features and high human intervention. These techniques continue to employ manual design and ignore the opportunity of using the rich feature information that can be learned from training data to directly generate vectorized boundary descriptions. Aiming to address this problem, we introduce PolygonCNN, a learnable end-to-end vector shape modeling framework for generating building outlines from aerial images. The framework first performs an FCN-like segmentation to extract initial building contours. Then, by encoding the vertices of the building polygons along with the pooled image features extracted from segmentation step, a modified PointNet is proposed to learn shape priors and predict a polygon vertex deformation to generate refined building vector results. Additionally, we propose 1) a simplify-and-densify sampling strategy to generate homogeneously sampled polygon with well-kept geometric signals for shape prior learning; and 2) a novel loss function for estimating shape similarity between building polygons with vastly different vertex numbers. The experiments on over 10,000 building samples verify that PolygonCNN can generate building vectors with higher vertex-based F1-score than the state-of-the-art method, and simultaneously well maintains the building segmentation accuracy achieved by the FCN-like model.}
+}
+
+
 @article{bolin2020investigation-9,
   title={An investigation of the influence of the refractive shadow zone on wind turbine noise},
   author={Bolin, Karl and Conrady, Kristina and Karasalo, Ilkka and Sj{\"o}blom, Anna},
@@ -179,3 +210,20 @@ DOI = {10.3390/ijgi7100413}
   title = {TransBigData: A Python package for transportation spatio-temporal big data processing, analysis and visualization},
   journal = {Journal of Open Source Software}
 }
+
+@Article{rs13163297,
+AUTHOR = {Zhang, Ying and Roffey, Matthew and Leblanc, Sylvain G.},
+TITLE = {A Novel Framework for Rapid Detection of Damaged Buildings Using Pre-Event LiDAR Data and Shadow Change Information},
+JOURNAL = {Remote Sensing},
+VOLUME = {13},
+YEAR = {2021},
+NUMBER = {16},
+ARTICLE-NUMBER = {3297},
+URL = {https://www.mdpi.com/2072-4292/13/16/3297},
+ISSN = {2072-4292},
+ABSTRACT = {After a major earthquake in a dense urban area, the spatial distribution of heavily damaged buildings is indicative of the impact of the event on public safety. Timely assessment of the locations of severely damaged buildings and their damage morphologies using remote sensing approaches is critical for search and rescue actions. Detection of damaged buildings that did not suffer collapse can be highly challenging from aerial or satellite optical imagery, especially those structures with height-reduction or inclination damage and apparently intact roofs. A key information cue can be provided by a comparison of predicted building shadows based on pre-event building models with shadow estimates extracted from post-event imagery. This paper addresses the detection of damaged buildings in dense urban areas using the information of building shadow changes based on shadow simulation, analysis, and image processing in order to improve real-time damage detection and analysis. A novel processing framework for the rapid detection of damaged buildings without collapse is presented, which includes (a) generation of building digital surface models (DSMs) from pre-event LiDAR data, (b) building shadow detection and extraction from imagery, (c) simulation of predicted building shadows utilizing building DSMs, and (d) detection and identification of shadow areas exhibiting significant pre- and post-event differences that can be attributed to building damage. The framework is demonstrated through two simulated case studies. The building damage types considered are those typically observed in earthquake events and include height-reduction, over-turn collapse, and inclination. Total collapse cases are not addressed as these are comparatively easy to be detected using simpler algorithms. Key issues are discussed including the attributes of essential information layers and sources of error influencing the accuracy of building damage detection.},
+DOI = {10.3390/rs13163297}
+}
+
+
+
