@@ -6,8 +6,17 @@
 
 ## Introduction
 
-`pybdshadow` is a python package for generating, analyzing and visualizing building shadows.
-The latest stable release of the software can be installed via pip and full documentation can be found [here](https://pybdshadow.readthedocs.io/en/latest/).
+`pybdshadow` is a python package for generating, analyzing and visualizing building shadows from large scale building geographic data. `pybdshadow` support generate building shadows from both sun light and point light. `pybdshadow` provides an efficient and easy-to-use method to generate a new source of geospatial data with great application potential in urban study. The latest stable release of the software can be installed via pip and full documentation can be found [here](https://pybdshadow.readthedocs.io/en/latest/).
+
+
+Currently, `pybdshadow` mainly provides the following methods:
+
+- *Generating building shadow from sun light*: With given location and time, the function in `pybdshadow` uses the properties of sun position obtained from [`suncalc-py`](https://github.com/kylebarron/suncalc-py) and the building height to generate shadow geometry data.
+- *Generating building shadow from point light*: `pybdshadow` can generate the building shadow with given location and height of the point light, which can be potentially useful for visual area analysis in urban environment.
+- *Analysis*: `pybdshadow` integrated the analysing method based on the properties of sun movement to track the changing position of shadows within a fixed time interval. Based on the grid processing framework provided by [`TransBigData`](https://github.com/ni1o1/transbigdata), `pybdshadow` is capable of calculating sunshine time on the ground and on the roof.
+- *Visualization*: Built-in visualization capabilities leverage the visualization package `keplergl` to interactively visualize building and shadow data in Jupyter notebooks with simple code.
+
+The target audience of `pybdshadow` includes data science researchers and data engineers in the field of BIM, GIS, energy, environment, and urban computing.
 
 ## Usage
 
