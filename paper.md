@@ -49,10 +49,10 @@ In Python environment, geospatial analysing package like `geopandas`, `PySAL` pr
 
 Currently, `pybdshadow` mainly provides the following methods:
 
-- Generating building shadow from sun light: With given location and time, the function in `pybdshadow` uses the properties of sun position obtained from `suncalc-py` and the building height to generate shadow geometry data.((\autoref{fig:fig1})(a))
-- Generating building shadow from point light: `pybdshadow` can generate the building shadow with given location and height of the point light, which can be potentially useful for visual area analysis in urban environment.((\autoref{fig:fig1})(b))
-- Analysis: `pybdshadow` integrated the analysing method based on the properties of sun movement to track the changing position of shadows within a fixed time interval. Based on the grid processing framework provided by `TransBigData`[@Yu2022], `pybdshadow` is capable of calculating sunshine time on the ground and on the roof(\autoref{fig:fig2})
-- Visualization: Built-in visualization capabilities leverage the visualization package `keplergl` to interactively visualize building and shadow data in Jupyter notebooks with simple code.
+- *Generating building shadow from sun light*: With given location and time, the function in `pybdshadow` uses the properties of sun position obtained from `suncalc-py` and the building height to generate shadow geometry data(\autoref{fig:fig1}(a)).
+- *Generating building shadow from point light*: `pybdshadow` can generate the building shadow with given location and height of the point light, which can be potentially useful for visual area analysis in urban environment(\autoref{fig:fig1}(b)).
+- *Analysis*: `pybdshadow` integrated the analysing method based on the properties of sun movement to track the changing position of shadows within a fixed time interval. Based on the grid processing framework provided by `TransBigData`[@Yu2022], `pybdshadow` is capable of calculating sunshine time on the ground and on the roof(\autoref{fig:fig2}).
+- *Visualization*: Built-in visualization capabilities leverage the visualization package `keplergl` to interactively visualize building and shadow data in Jupyter notebooks with simple code.
 
 The target audience of `pybdshadow` includes data science researchers and data engineers in the field of BIM, GIS, energy, environment, and urban computing.
 
