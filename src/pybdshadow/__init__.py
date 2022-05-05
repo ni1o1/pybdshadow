@@ -32,7 +32,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 __author__ = 'Qing Yu <qingyu0815@foxmail.com>'
 
 # module level doc-string

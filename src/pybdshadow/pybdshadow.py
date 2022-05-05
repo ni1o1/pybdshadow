@@ -330,5 +330,5 @@ def bdshadow_pointlight(buildings,
         wallsBuilding = wallsBuilding.groupby(['building_id'])['geometry'].apply(
             lambda df: MultiPolygon(list(df)).buffer(0)).reset_index()
         #print(wallsBuilding)
-
-    return [walls,wallsBuilding]
+    shadows=wallsBuilding
+    return shadows

@@ -5,7 +5,7 @@ import geopandas as gpd
 from shapely.geometry import Polygon
 
 
-class Testpybdshadow:
+class Testsunlightshadow:
     def test_bdshadow_sunlight(self):
 
         buildings = gpd.GeoDataFrame({
