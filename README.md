@@ -2,7 +2,7 @@
 
 ![1649074615552.png](https://github.com/ni1o1/pybdshadow/raw/main/image/README/1649074615552.png)
 
-[![Documentation Status](https://readthedocs.org/projects/pybdshadow/badge/?version=latest)](https://pybdshadow.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://pepy.tech/badge/pybdshadow)](https://pepy.tech/project/pybdshadow) [![codecov](https://codecov.io/gh/ni1o1/pybdshadow/branch/main/graph/badge.svg?token=GLAVYYCD9L)](https://codecov.io/gh/ni1o1/pybdshadow) [![Tests](https://github.com/ni1o1/pybdshadow/actions/workflows/tests.yml/badge.svg)](https://github.com/ni1o1/pybdshadow/actions/workflows/tests.yml)
+[![Documentation Status](https://readthedocs.org/projects/pybdshadow/badge/?version=latest)](https://pybdshadow.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://pepy.tech/badge/pybdshadow)](https://pepy.tech/project/pybdshadow) [![codecov](https://codecov.io/gh/ni1o1/pybdshadow/branch/main/graph/badge.svg?token=GLAVYYCD9L)](https://codecov.io/gh/ni1o1/pybdshadow) [![Tests](https://github.com/ni1o1/pybdshadow/actions/workflows/tests.yml/badge.svg)](https://github.com/ni1o1/pybdshadow/actions/workflows/tests.yml) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ni1o1/pybdshadow/3d7f14d9db7fe2060e18e12935021ee9df4e1d5d?urlpath=lab%2Ftree%2Fexample%2FExample1-building_shadow_analysis.ipynb)
 
 ## Introduction
 
