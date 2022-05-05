@@ -41,27 +41,20 @@ Existing methods of generating and detecting building shadows can be devided int
 Zhou et al. developed a shadow detection method by combining the zero-crossing detection method with the DBM-based geometric method to identify shadow from high-resolution images[@zhou2015integrated-10; @rs12040679-11].
 - BIM/GIS analysis: Another way of obtaining building shadow is to transform Building Information Model(BIM) to its corresponding geo-located model[@RAFIEE2014397-12]. The Hillshade function provided in ArcGIS is capable of producing a grayscale 3D representation of the terrain surface, which can be used as a tool for analysing building shadow. Hong et al. analyze the building shadow using Hillshade Analysis and estimate the available rooftop area for PV System[@HONG2016408-13]. Miranda et al. propose an approach that uses the properties of sun movement to track the changing position of shadows within a fixed time interval[@8283638-14].
 
-In Python environment, geospatial analysing package like `geopandas`, `turfpy`, `PySAL` provide tools to easily implement the spatial analysis of spatial data. Nevertheless, there is a lack of an effective tool for generating and analyzing building shadows that is compatible with the Python data processing framework.
+In Python environment, geospatial analysing package like `geopandas`, `PySAL` provide tools to easily implement the spatial analysis of spatial data[@kelsey_jordahl_2021_5573592; @pysal2007]. Nevertheless, there is a lack of an effective tool for generating and analyzing building shadows that is compatible with the Python geospatial data processing framework.
 
 # Statement of need
 
-pybdshadow is a python package for generating, analyzing and visualizing building shadows.
+`pybdshadow` is a python package for generating, analyzing and visualizing building shadows from large scale building geographic data. `pybdshadow` support generate building shadows from both sun light and point light. `pybdshadow` provides an efficient and easy-to-use method to generate a new source of geospatial data with great application potential in urban study.
 
-提供了平行光源与点光源的建筑阴影向量化计算方法，针对地理矢量建筑数据在不同光源类型及光源位置下的阴影分析及显示。实现数据处理、阴影计算、可视化的集成效果。
+Currently, `pybdshadow` mainly provides the following methods:
 
-`pybdshadow` presents an important new source of geospatial network data
-目前pybdshadow提供了以下功能：
+- Generating building shadow from sun light: With given location and time, the function in `pybdshadow` uses the properties of sun position obtained from `suncalc-py` and the building height to generate shadow geometry data.((\autoref{fig:fig1})(a))
+- Generating building shadow from point light: `pybdshadow` can generate the building shadow with given location and height of the point light, which can be potentially useful for visual area analysis in urban environment.((\autoref{fig:fig1})(b))
+- Analysis: `pybdshadow` integrated the analysing method based on the properties of sun movement to track the changing position of shadows within a fixed time interval. Based on the grid processing framework provided by `TransBigData`[@Yu2022], `pybdshadow` is capable of calculating sunshine time on the ground and on the roof(\autoref{fig:fig2})
+- Visualization: Built-in visualization capabilities leverage the visualization package `keplergl` to interactively visualize building and shadow data in Jupyter notebooks with simple code.
 
-- Preprocess:将用户输入的数据处理成所需要的geopandas格式。Building Data
-- Calculation: 包括平行光源与点光源。平行光源：根据用户输入的经纬度及时间利用suncalc库计算太阳方位角及高度角，利用太阳角度信息推算阴影位置。点光源：用户输入一个三维坐标，计算在该点光源下的投影
-- Analysis: 基于 `TransBigData` 提供了分析的功能[@Yu2022]
-  (\autoref{fig:fig2})
-- Visualization: Built-in visualization capabilities leverage the visualization package `keplergl` to interactively visualize data in Jupyter notebooks with simple code.(\autoref{fig:fig1})
-
-The target audience of `pybdshadow` includes:
-
-1. Data science researchers and data engineers in the field of xxx, xxx, and urban computing, particularly those who want to xxx;
-2. Government, enterprises, or other entities who expect xxx management decision support through xxx spatio-temporal data analysis.
+The target audience of `pybdshadow` includes data science researchers and data engineers in the field of BIM, GIS, energy, environment, and urban computing.
 
 The latest stable release of the software can be installed via `pip` and full documentation can be found at https://pybdshadow.readthedocs.io/en/latest/.
 

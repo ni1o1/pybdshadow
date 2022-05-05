@@ -11,7 +11,7 @@ Shadow from sunlight
 
 .. function:: pybdshadow.bdshadow_sunlight(buildings, date,  height='height', roof=False,include_building = True,ground=0)
 
-Calculate the sunlight shadow of the buildings.
+Generate the shadow of the buildings from sunlight.
 
 **Parameters**
 
@@ -38,7 +38,7 @@ Shadow from pointlight
 
 .. function:: pybdshadow.bdshadow_pointlight(buildings, pointlon, pointlat, pointheight, merge=True, height='height', ground=0)
 
-Calculate the sunlight shadow of the buildings.
+Generate the shadow of the buildings from point light.
 
 **Parameters**
 
