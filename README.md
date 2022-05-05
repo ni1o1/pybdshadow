@@ -6,7 +6,11 @@
 
 ## Introduction
 
-`pybdshadow` is a python package for generating, analyzing and visualizing building shadows from large scale building geographic data. `pybdshadow` support generate building shadows from both sun light and point light. `pybdshadow` provides an efficient and easy-to-use method to generate a new source of geospatial data with great application potential in urban study. The latest stable release of the software can be installed via pip and full documentation can be found [here](https://pybdshadow.readthedocs.io/en/latest/).
+`pybdshadow` is a python package for generating, analyzing and visualizing building shadows from large scale building geographic data. `pybdshadow` support generate building shadows from both sun light and point light. `pybdshadow` provides an efficient and easy-to-use method to generate a new source of geospatial data with great application potential in urban study. 
+
+The latest stable release of the software can be installed via pip and full documentation can be found [here](https://pybdshadow.readthedocs.io/en/latest/).
+
+## Functionality
 
 Currently, `pybdshadow` mainly provides the following methods:
 
