@@ -108,11 +108,11 @@ pybdshadow.show_bdshadow(buildings = buildings,shadows = shadows)
 
 Result of shadow coverage on the roof:
 
-![1651645524782.png](image/README/1651645524782.png)
+![1651645524782.png](image/README/1651645524782.png)![1651975815798.png](image/README/1651975815798.png)
 
 Result of sunshine time on the ground:
 
-![1651645530892.png](image/README/1651645530892.png)
+![1651645530892.png](image/README/1651645530892.png)![1651975824187.png](image/README/1651975824187.png)
 
 ## Dependency
 
