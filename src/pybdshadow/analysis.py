@@ -28,7 +28,6 @@ def get_timetable(lon, lat, dates=['2022-01-01'], precision=3600, padding=1800):
     dates['date'] = dates['datetime'].apply(lambda r: str(r)[:19])
     return dates
 
-
 def cal_sunshine(buildings, day='2022-01-01', roof=False,grids =  gpd.GeoDataFrame(), accuracy=1, precision=3600, padding=0):
     '''
     Calculate the sunshine time in given date.
@@ -48,7 +47,7 @@ def cal_sunshine(buildings, day='2022-01-01', roof=False,grids =  gpd.GeoDataFra
     padding : number
         padding time before and after sunrise and sunset
     accuracy : number
-        size of grids.
+        size of grids. Produce vector polygons if set as `vector` 
         
     **Return**
 
@@ -69,12 +68,35 @@ def cal_sunshine(buildings, day='2022-01-01', roof=False,grids =  gpd.GeoDataFra
 
     # Generate shadow every 1800 s
     shadows = cal_sunshadows(buildings, dates=[day], precision=precision, padding=padding)
-    # Grid analysis of shadow cover duration(ground).
-    grids = cal_shadowcoverage(
-        shadows, buildings, grids = grids,roof=roof, precision=precision, accuracy=accuracy)
+    if accuracy == 'vector':
+        if roof:
+            shadows = shadows[shadows['type'] == 'roof'] 
+            shadows = bd_preprocess(shadows)
+            shadows = shadows.groupby(['date','type'])['geometry'].apply(
+                        lambda df: MultiPolygon(list(df)).buffer(0)).reset_index()
+            shadows = bd_preprocess(shadows)
+            shadows = count_overlapping_features(shadows)
+        else:
+            shadows = shadows[shadows['type'] == 'ground'] 
+            shadows = bd_preprocess(shadows)
+            shadows = shadows.groupby(['date','type'])['geometry'].apply(
+                        lambda df: MultiPolygon(list(df)).buffer(0)).reset_index()
+            shadows = bd_preprocess(shadows)
+            shadows = count_overlapping_features(shadows)
 
-    grids['Hour'] = sunlighthour-grids['time']/3600
-    return grids
+        shadows['time'] = shadows['count']*precision
+        shadows['Hour'] = sunlighthour-shadows['time']/3600
+        shadows.loc[shadows['Hour']<=0,'Hour']=0
+        return shadows
+    else:
+        # Grid analysis of shadow cover duration(ground).
+        grids = cal_shadowcoverage(
+            shadows, buildings, grids = grids,roof=roof, precision=precision, accuracy=accuracy)
+
+        grids['Hour'] = sunlighthour-grids['time']/3600
+        return grids
+
+    
 
 
 def cal_sunshadows(buildings, cityname='somecity', dates=['2022-01-01'], precision=3600, padding=0,
@@ -196,3 +218,16 @@ def cal_shadowcoverage(shadows_input, buildings, grids = gpd.GeoDataFrame(),roof
     grids['time'] = grids['count'].fillna(0)*precision
 
     return grids
+
+def count_overlapping_features(gdf):
+    import shapely
+    bounds = gdf.geometry.exterior.unary_union
+    new_polys = list(shapely.ops.polygonize(bounds))
+    new_gdf = gpd.GeoDataFrame(geometry=new_polys)
+    new_gdf['id'] = range(len(new_gdf))
+    new_gdf_centroid = new_gdf.copy()
+    new_gdf_centroid['geometry'] = new_gdf.centroid
+    overlapcount = gpd.sjoin(new_gdf_centroid,gdf)
+    overlapcount = overlapcount.groupby(['id'])['index_right'].count().rename('count').reset_index()
+    out_gdf = pd.merge(new_gdf,overlapcount)
+    return out_gdf
