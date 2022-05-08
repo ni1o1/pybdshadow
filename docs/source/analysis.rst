@@ -28,7 +28,7 @@ precision : number
 padding : number
     padding time before and after sunrise and sunset
 accuracy : number
-    size of grids.
+    size of grids. Produce vector polygons if set as `vector` 
     
 **Return**
 
