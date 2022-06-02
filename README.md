@@ -128,7 +128,7 @@ Result of sunshine time on the ground:
 * [`keplergl`](https://kepler.gl/)
 * [`TransBigData`](https://github.com/ni1o1/transbigdata)
 
-## Citation information [![status](https://joss.theoj.org/papers/9d4c2bf5285cffed1be3065ad7da94dd/status.svg)](https://joss.theoj.org/papers/9d4c2bf5285cffed1be3065ad7da94dd)
+## Citation information
 
 Citation information can be found at [CITATION.cff](https://github.com/ni1o1/pybdshadow/blob/main/CITATION.cff).
 
