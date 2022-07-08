@@ -39,16 +39,19 @@ def bd_preprocess(buildings, height=''):
     Preprocess building data, so that we can perform shadow calculation.
     Remove empty polygons and convert multipolygons into polygons.
 
-    **Parameters**
+    Parameters
+    --------------
     buildings : GeoDataFrame
         Buildings.
     height : string
         Column name of building height
 
-    **Return**
+    Return
+    ----------
     allbds : GeoDataFrame
         Polygon buildings
     '''
+    buildings['geometry'] = buildings.buffer(0)
     buildings = buildings[buildings.is_valid].copy()
     if height!='':
         # 建筑高度筛选
@@ -70,8 +73,12 @@ def bd_preprocess(buildings, height=''):
         allbds.append(singlebd)
     allbds.append(polygon_buildings)
     allbds = pd.concat(allbds)
-    allbds['building_id'] = range(len(allbds))
-    allbds['geometry'] = allbds.buffer(0)
+    if len(allbds) > 0:
+        allbds = gpd.GeoDataFrame(allbds)
+        allbds['building_id'] = range(len(allbds))
+        allbds['geometry'] = allbds.buffer(0)
+    else:
+        allbds = gpd.GeoDataFrame()
     return allbds
 
 def gdf_difference(gdf_a,gdf_b,col = 'building_id'):

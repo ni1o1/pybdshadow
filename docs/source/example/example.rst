@@ -126,7 +126,7 @@ column storing the geometry polygon information of building outline.
 
 
 Before analysing buildings, make sure to preprocess building data using
-``pybdshadow.bd_preprocess`` before calculate shadow. It will remove
+:func:`pybdshadow.bd_preprocess` before calculate shadow. It will remove
 empty polygons, convert multipolygons into polygons and generate
 ``building_id`` for each building.
 
@@ -448,7 +448,7 @@ smaller area for detail analysis of shadow coverage.
 .. image:: output_24_1.png
 
 
-Use ``pybdshadow.cal_sunshine`` to analyse shadow coverage and sunshine
+Use :func:`pybdshadow.cal_sunshine` to analyse shadow coverage and sunshine
 time. Here, we select ``2022-01-01`` as the date, set the spatial
 resolution of 1 meter*1 meter grids, and 900 s as the time interval.
 

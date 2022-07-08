@@ -78,11 +78,10 @@ def calSunShadow_vector(shape, shapeHeight, sunPosition):
 
 
 def bdshadow_sunlight(buildings, date,  height='height', roof=False,include_building = True,ground=0):
-    '''
-    Calculate the sunlight shadow of the buildings.
+    '''Calculate the sunlight shadow of the buildings.
 
-    **Parameters**
-
+    Parameters
+    ----------
     buildings : GeoDataFrame
         Buildings. coordinate system should be WGS84
     date : datetime
@@ -96,8 +95,8 @@ def bdshadow_sunlight(buildings, date,  height='height', roof=False,include_buil
     ground : number
         Height of the ground
 
-    **Return**
-
+    Returns
+    ----------
     shadows : GeoDataFrame
         Building shadow
     '''
@@ -264,7 +263,8 @@ def bdshadow_pointlight(buildings,
     '''
     Calculate the sunlight shadow of the buildings.
 
-    **Parameters**
+    Parameters
+    --------------------
     buildings : GeoDataFrame
         Buildings. coordinate system should be WGS84
     pointlon,pointlat,pointheight : float
@@ -277,8 +277,9 @@ def bdshadow_pointlight(buildings,
         Column name of building height
     ground : number
         Height of the ground
-
-    **Return**
+    
+    Returns
+    ----------
     shadows : GeoDataFrame
         Building shadow
     '''

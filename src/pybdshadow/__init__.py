@@ -53,7 +53,8 @@ from .visualization import (
 from .analysis import (
     cal_sunshine,
     cal_sunshadows,
-    cal_shadowcoverage
+    cal_shadowcoverage,
+    get_timetable
 )
 
 __all__ = ['bdshadow_sunlight',
@@ -63,4 +64,5 @@ __all__ = ['bdshadow_sunlight',
            'cal_sunshine',
            'cal_sunshadows',
            'cal_shadowcoverage',
+           'get_timetable'
            ]

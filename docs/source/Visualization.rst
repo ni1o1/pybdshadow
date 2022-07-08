@@ -1,6 +1,7 @@
 .. _Visualization:
 
-
+.. currentmodule:: pybdshadow
+    
 *****************************
 Visualization
 *****************************
@@ -17,28 +18,4 @@ If you want to display the visualization results in jupyter notebook, you need t
 Visualization
 --------------------------------------
 
-.. function:: pybdshadow.show_bdshadow(buildings=gpd.GeoDataFrame(),shadows=gpd.GeoDataFrame(),ad=gpd.GeoDataFrame(),ad_visualArea=gpd.GeoDataFrame(),height='height',zoom='auto')
-
-Visualize the building and shadow with keplergl.
-
-**Parameters**
-
-buildings : GeoDataFrame
-    Buildings. coordinate system should be WGS84
-shadows : GeoDataFrame
-    Building shadows. coordinate system should be WGS84
-ad : GeoDataFrame
-    Advertisment. coordinate system should be WGS84
-ad_visualArea : GeoDataFrame
-    Visualarea of Advertisment. coordinate system should be WGS84
-height : string
-    Column name of building height
-zoom : number
-    Zoom level of the map
-
-**Return**
-
-vmap : keplergl.keplergl.KeplerGl
-    Visualizations provided by keplergl
-
-
+.. autofunction:: show_bdshadow

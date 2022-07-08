@@ -42,7 +42,8 @@ def show_bdshadow(buildings=gpd.GeoDataFrame(),
     '''
     Visualize the building and shadow with keplergl.
 
-    **Parameters**
+    Parameters
+    --------------------
     buildings : GeoDataFrame
         Buildings. coordinate system should be WGS84
     shadows : GeoDataFrame
@@ -56,7 +57,8 @@ def show_bdshadow(buildings=gpd.GeoDataFrame(),
     zoom : number
         Zoom level of the map
 
-    **Return**
+    Return
+    --------------------
     vmap : keplergl.keplergl.KeplerGl
         Visualizations provided by keplergl
     '''
