@@ -87,13 +87,13 @@ def bdshadow_sunlight(buildings, date,  height='height', roof=False,include_buil
     date : datetime
         Datetime
     height : string
-        Column name of building height
+        Column name of building height(meter).
     roof : bool
-        whether to calculate the roof shadows
+        Whether to calculate the roof shadows.
     include_building : bool
-        whether the shadow include building outline
+        Whether the shadow include building outline.
     ground : number
-        Height of the ground
+        Height of the ground(meter).
 
     Returns
     ----------
@@ -270,13 +270,13 @@ def bdshadow_pointlight(buildings,
     buildings : GeoDataFrame
         Buildings. coordinate system should be WGS84
     pointlon,pointlat,pointheight : float
-        Point light coordinates and height
+        Point light coordinates and height(meter).
     date : datetime
         Datetime
     merge : bool
-        whether to merge the wall shadows into the building shadows
+        Whether to merge the wall shadows into the building shadows
     height : string
-        Column name of building height
+        Column name of building height(meter).
     ground : number
         Height of the ground
     
