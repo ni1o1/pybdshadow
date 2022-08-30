@@ -29,7 +29,7 @@ def get_timetable(lon, lat, dates=['2022-01-01'], precision=3600, padding=1800):
     return dates
 
 
-def cal_sunshine(buildings, day='2022-01-01', roof=False, grids=gpd.GeoDataFrame(), accuracy=1, precision=3600, padding=0):
+def cal_sunshine(buildings, day='2022-01-01', roof=False, grids=gpd.GeoDataFrame(), accuracy=1, precision=3600, padding=1800):
     '''
     Calculate the sunshine time in given date.
 
@@ -99,7 +99,7 @@ def cal_sunshine(buildings, day='2022-01-01', roof=False, grids=gpd.GeoDataFrame
         return grids
 
 
-def cal_sunshadows(buildings, cityname='somecity', dates=['2022-01-01'], precision=3600, padding=0,
+def cal_sunshadows(buildings, cityname='somecity', dates=['2022-01-01'], precision=3600, padding=1800,
                    roof=True, include_building=True, save_shadows=False, printlog=False):
     '''
     Calculate the sunlight shadow in different date with given time precision.
@@ -111,11 +111,11 @@ def cal_sunshadows(buildings, cityname='somecity', dates=['2022-01-01'], precisi
     cityname : string
         Cityname. If save_shadows, this function will create `result/cityname` folder to save the shadows
     dates : list
-        list of dates
+        List of dates
     precision : number
-        time precision(s)
+        Time precision(s)
     padding : number
-        padding time before and after sunrise and sunset
+        Padding time (second) before and after sunrise and sunset. Should be over 1800s to avoid sun altitude under 0
     roof : bool
         whether to calculate roof shadow.
     include_building : bool
@@ -130,6 +130,8 @@ def cal_sunshadows(buildings, cityname='somecity', dates=['2022-01-01'], precisi
     allshadow : GeoDataFrame
         All building shadows calculated
     '''
+    if (padding<1800):
+        raise ValueError('Padding time should be over 1800s to avoid sun altitude under 0')
     # obtain city location
     lon, lat = buildings['geometry'].iloc[0].bounds[:2]
     timetable = get_timetable(lon, lat, dates, precision, padding)
