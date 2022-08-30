@@ -44,7 +44,7 @@ def bd_preprocess(buildings, height=''):
     buildings : GeoDataFrame
         Buildings.
     height : string
-        Column name of building height
+        Column name of building height(meter).
 
     Return
     ----------
