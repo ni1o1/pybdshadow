@@ -130,24 +130,25 @@ def cal_sunshadows(buildings, cityname='somecity', dates=['2022-01-01'], precisi
     allshadow : GeoDataFrame
         All building shadows calculated
     '''
-    if (padding<1800):
-        raise ValueError('Padding time should be over 1800s to avoid sun altitude under 0')
+    if (padding < 1800):
+        raise ValueError(
+            'Padding time should be over 1800s to avoid sun altitude under 0')  # pragma: no cover
     # obtain city location
     lon, lat = buildings['geometry'].iloc[0].bounds[:2]
     timetable = get_timetable(lon, lat, dates, precision, padding)
     import os
     if save_shadows:
-        if not os.path.exists('result'):
-            os.mkdir('result')
-        if not os.path.exists('result/'+cityname):
-            os.mkdir('result/'+cityname)
+        if not os.path.exists('result'):             # pragma: no cover
+            os.mkdir('result')                       # pragma: no cover
+        if not os.path.exists('result/'+cityname):   # pragma: no cover
+            os.mkdir('result/'+cityname)             # pragma: no cover
     allshadow = []
     for i in range(len(timetable)):
         date = timetable['datetime'].iloc[i]
         name = timetable['date'].iloc[i]
         if not os.path.exists('result/'+cityname+'/roof_'+name+'.json'):
             if printlog:
-                print('Calculating', cityname, ':', name)
+                print('Calculating', cityname, ':', name)    # pragma: no cover
             # Calculate shadows
             shadows = bdshadow_sunlight(
                 buildings, date, roof=roof, include_building=include_building)
@@ -156,12 +157,12 @@ def cal_sunshadows(buildings, cityname='somecity', dates=['2022-01-01'], precisi
             ground_shaodws = shadows[shadows['type'] == 'ground']
 
             if save_shadows:
-                if len(roof_shaodws) > 0:
-                    roof_shaodws.to_file(
-                        'result/'+cityname+'/roof_'+name+'.json', driver='GeoJSON')
-                if len(ground_shaodws) > 0:
-                    ground_shaodws.to_file(
-                        'result/'+cityname+'/ground_'+name+'.json', driver='GeoJSON')
+                if len(roof_shaodws) > 0:    # pragma: no cover
+                    roof_shaodws.to_file(    # pragma: no cover
+                        'result/'+cityname+'/roof_'+name+'.json', driver='GeoJSON')  # pragma: no cover
+                if len(ground_shaodws) > 0:  # pragma: no cover
+                    ground_shaodws.to_file(  # pragma: no cover
+                        'result/'+cityname+'/ground_'+name+'.json', driver='GeoJSON')  # pragma: no cover
             allshadow.append(shadows)
     allshadow = pd.concat(allshadow)
     return allshadow

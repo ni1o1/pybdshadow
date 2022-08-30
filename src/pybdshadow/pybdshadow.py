@@ -114,8 +114,7 @@ def bdshadow_sunlight(buildings, date,  height='height', roof=False,include_buil
     # obtain sun position
     sunPosition = get_position(date, lon, lat)
     if ( sunPosition['altitude']<0):
-        print(date, lon, lat,sunPosition)
-        raise ValueError("Given time before sunrise or after sunset")
+        raise ValueError("Given time before sunrise or after sunset")   # pragma: no cover
     buildingshadow = building.copy()
 
     a = buildingshadow['geometry'].apply(lambda r: list(r.exterior.coords))
