@@ -1,3 +1,4 @@
+requests
 rtree
 geopandas
 matplotlib
