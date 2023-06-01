@@ -24,8 +24,8 @@ copyright = '2022, Qing Yu'
 author = 'Qing Yu'
 
 # The full version, including alpha/beta/rc tags
-release = '0.3.3'
-version = '0.3.3'
+release = '0.3.4'
+version = '0.3.4'
 html_logo = "_static/logo-wordmark-light.png"
 html_favicon = '_static/logo.ico'
 # -- General configuration ---------------------------------------------------

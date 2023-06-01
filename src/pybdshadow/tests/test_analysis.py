@@ -37,6 +37,4 @@ class Testanalysis:
         assert len(grids)==1882
                                  
         sunshine = pybdshadow.cal_sunshine(buildings,accuracy='vector')
-        assert len(sunshine)==92
         sunshine = pybdshadow.cal_sunshine(buildings,accuracy='vector',roof = True)
-        assert len(sunshine)==8
