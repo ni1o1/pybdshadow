@@ -30,44 +30,84 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import math
 import numpy as np
 
+def lonlat2aeqd(lonlat):
+    '''
+    Convert longitude and latitude to azimuthal equidistant projection coordinates.
 
-def lonlat_mercator(lonlat):
-    mercator = lonlat.copy()
-    earthRad = 6378137.0
-    mercator[0] = lonlat[0] * math.pi / 180 * earthRad  # 角度转弧度
-    a = lonlat[1] * math.pi / 180  # 弧度制纬度
-    mercator[1] = earthRad / 2 * \
-        math.log((1.0 + math.sin(a)) / (1.0 - math.sin(a)))
-    return mercator
+    Parameters
+    ----------
+    lonlat : numpy.ndarray
+        Longitude and latitude in degrees. The shape of the array is (n,m,2), where n and m are the number of pixels in the first and second dimension, respectively. The last dimension is for longitude and latitude.
+
+    Returns
+    -------
+    proj_coords : numpy.ndarray
+        Azimuthal equidistant projection coordinates. The shape of the array is (n,m,2), where n and m are the number of pixels in the first and second dimension, respectively. The last dimension is for x and y coordinates.
+
+    example
+    -----------------
+    >>> import numpy as np
+    >>> from pybdshadow import utils
+    >>> lonlat = np.array([[[120,30],[121,31]],[[120,30],[121,31]]])
+    >>> proj_coords = utils.lonlat2aeqd(lonlat)
+    >>> proj_coords
+    array([[[-48243.5939812 , -55322.02388971],
+            [ 47752.57582735,  55538.86412435]],
+           [[-48243.5939812 , -55322.02388971],
+            [ 47752.57582735,  55538.86412435]]])
+    '''
+    meanlon = lonlat[:,:,0].mean()
+    meanlat = lonlat[:,:,1].mean()
+    from pyproj import CRS
+    epsg = CRS.from_proj4("+proj=aeqd +lat_0="+str(meanlat)+" +lon_0="+str(meanlon)+" +datum=WGS84")
+    from pyproj import Transformer
+    transformer = Transformer.from_crs("EPSG:4326", epsg,always_xy = True)
+    proj_coords = transformer.transform(lonlat[:,:,0], lonlat[:,:,1])
+    proj_coords = np.array(proj_coords).transpose([1,2,0])
+    return proj_coords
 
 
-def lonlat_mercator_vector(lonlat):
-    mercator = np.zeros_like(lonlat)
-    earthRad = 6378137.0
-    mercator[:, :, 0] = lonlat[:, :, 0] * math.pi / 180 * earthRad  # 角度转弧度
-    a = lonlat[:, :, 1] * math.pi / 180  # 弧度制纬度
-    mercator[:, :, 1] = earthRad / 2 * \
-        np.log((1.0 + np.sin(a)) / (1.0 - np.sin(a)))
-    return mercator
+def aeqd2lonlat(proj_coords,meanlon,meanlat):
+    '''
+    Convert azimuthal equidistant projection coordinates to longitude and latitude.
 
+    Parameters
+    ----------
+    proj_coords : numpy.ndarray
+        Azimuthal equidistant projection coordinates. The shape of the array is (n,m,2), where n and m are the number of pixels in the first and second dimension, respectively. The last dimension is for x and y coordinates.
+    meanlon : float
+        Longitude of the center of the azimuthal equidistant projection in degrees.
+    meanlat : float
+        Latitude of the center of the azimuthal equidistant projection in degrees.
 
-def mercator_lonlat(mercator):
-    lonlat = mercator.copy()
-    lonlat[0] = mercator[0]/20037508.34*180
-    temp = mercator[1]/20037508.34*180
-    lonlat[1] = 180/math.pi * \
-        (2*math.atan(math.exp(temp*math.pi/180)) - math.pi/2)  # 纬度的长度
+    Returns
+    -------
+    lonlat : numpy.ndarray
+        Longitude and latitude in degrees. The shape of the array is (n,m,2), where n and m are the number of pixels in the first and second dimension, respectively. The last dimension is for longitude and latitude.
+
+    Example
+    -----------------
+    >>> import numpy as np
+    >>> from pybdshadow import utils
+    >>> proj_coords = proj_coords = np.array(
+        [[[-48243.5939812 , -55322.02388971],
+          [ 47752.57582735,  55538.86412435]],
+         [[-48243.5939812 , -55322.02388971],
+          [ 47752.57582735,  55538.86412435]]])
+    >>> lonlat = utils.aeqd2lonlat(proj_coords,120.5,30.5)
+    >>> lonlat
+    array([[[120.,  30.],
+            [121.,  31.]],
+           [[120.,  30.],
+            [121.,  31.]]])
+    '''
+    from pyproj import CRS
+    epsg = CRS.from_proj4("+proj=aeqd +lat_0="+str(meanlat)+" +lon_0="+str(meanlon)+" +datum=WGS84")
+    from pyproj import Transformer
+    transformer = Transformer.from_crs( epsg,"EPSG:4326",always_xy = True)
+    lonlat = transformer.transform(proj_coords[:,:,0], proj_coords[:,:,1])
+    lonlat = np.array(lonlat).transpose([1,2,0])
     return lonlat
 
-
-def mercator_lonlat_vector(mercator):
-    lonlat = np.zeros_like(mercator)
-    lonlat[:, :, 0] = mercator[:, :, 0]/20037508.34*180
-    lonlat[:, :, 1] = mercator[:, :, 1]/20037508.34*180
-    lonlat[:, :, 1] = 180/math.pi * \
-        (2*np.arctan(np.exp(lonlat[:, :, 1]*math.pi/180)) - math.pi/2)
-
-    return lonlat

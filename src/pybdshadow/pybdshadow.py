@@ -36,20 +36,34 @@ from shapely.geometry import Polygon,LineString, MultiPolygon
 import math
 import numpy as np
 from .utils import (
-    lonlat_mercator_vector,
-    mercator_lonlat_vector
+    lonlat2aeqd,
+    aeqd2lonlat
 )
 from .preprocess import gdf_difference,gdf_intersect
 
 
 def calSunShadow_vector(shape, shapeHeight, sunPosition):
-    # 多维数据类型：numpy
-    # 输入的shape是一个矩阵（n*2*2) n个建筑物面，每个建筑有2个点，每个点有三个维度
-    # shapeHeight(n) 每一栋建筑的高度都是一样的
+    '''
+    Calculate the shadow of a building on the ground.
 
-    # 坐标系转换transform coordinate system
-    shape = lonlat_mercator_vector(shape)
-    # print(shape,np.shape(shape))
+    Parameters
+    ----------
+    shape : numpy.ndarray
+        The shape of the building. The shape of the array is (n,2,2), where n the number of walls, 2 is that each wall has two points, and the last dimension is for longitude and latitude.
+    shapeHeight : float
+        The height of the building.
+    sunPosition : dict
+        The position of the sun. The keys are 'azimuth' and 'altitude'.
+
+    Returns
+    -------
+    shadow : numpy.ndarray
+        The shadow of the building on the ground. shape = [n,5,2]
+    '''
+    # transform coordinate system
+    meanlon = shape[:,:,0].mean()
+    meanlat = shape[:,:,1].mean()
+    shape = lonlat2aeqd(shape)
 
     azimuth = sunPosition['azimuth']
     altitude = sunPosition['altitude']
@@ -57,28 +71,28 @@ def calSunShadow_vector(shape, shapeHeight, sunPosition):
     n = np.shape(shape)[0]
     distance = shapeHeight/math.tan(altitude)
 
-    # 计算投影位置偏移
-    lonDistance = distance*math.sin(azimuth)  # n个偏移量[n]
+    # calculate the offset of the projection position
+    lonDistance = distance*math.sin(azimuth) 
     lonDistance = lonDistance.reshape((n, 1))
     latDistance = distance*math.cos(azimuth)
     latDistance = latDistance.reshape((n, 1))
 
-    shadowShape = np.zeros((n, 5, 2))  # n个建筑物面，每个面都有5个点，每个点都有个维数
+    shadowShape = np.zeros((n, 5, 2)) # n buildings, each building has 5 points, each point has 2 dimensions
 
-    shadowShape[:, 0:2, :] += shape  # 前两个点不变
+    shadowShape[:, 0:2, :] += shape  
     shadowShape[:, 2:4, 0] = shape[:, :, 0] + lonDistance
     shadowShape[:, 2:4, 1] = shape[:, :, 1] + latDistance
 
     shadowShape[:, [2, 3], :] = shadowShape[:, [3, 2], :]
     shadowShape[:, 4, :] = shadowShape[:, 0, :]
 
-    shadowShape = mercator_lonlat_vector(shadowShape)
-    # print(shadowShape,np.shape(shadowShape))
+    shadowShape = aeqd2lonlat(shadowShape,meanlon,meanlat)
     return shadowShape
 
 
 def bdshadow_sunlight(buildings, date,  height='height', roof=False,include_building = True,ground=0):
-    '''Calculate the sunlight shadow of the buildings.
+    '''
+    Calculate the sunlight shadow of the buildings.
 
     Parameters
     ----------
@@ -228,6 +242,23 @@ def bdshadow_sunlight(buildings, date,  height='height', roof=False,include_buil
 
 
 def calPointLightShadow_vector(shape, shapeHeight, pointLight):
+    '''
+    calculate shadow for a point light
+    
+    Parameters
+    ----------
+    shape : numpy.array
+        The shape of the building. The shape of the array is (n,2,2), where n the number of walls, 2 is that each wall has two points, and the last dimension is for longitude and latitude.
+    shapeHeight : numpy.array
+        height of building, shape = [n,1], n is the number of buildings
+    pointLight : dict
+        point light, pointLight = {'position':[lon,lat,height]}
+    
+    Returns
+    -------
+    shadowShape : numpy.array
+        shape of shadow, shape = [n,5,2]
+    '''
     # 多维数据类型：numpy
     # 输入的shape是一个矩阵（n*2*2) n个建筑物面，每个建筑有2个点，每个点有三个维度
     # shapeHeight(n) 每一栋建筑的高度都是一样的
