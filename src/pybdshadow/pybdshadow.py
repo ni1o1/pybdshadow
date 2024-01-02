@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import pandas as pd
 import geopandas as gpd
 from suncalc import get_position
-from shapely.geometry import Polygon,LineString, MultiPolygon
+from shapely.geometry import Polygon, MultiPolygon
 import math
 import numpy as np
 from .utils import (
@@ -63,7 +63,7 @@ def calSunShadow_vector(shape, shapeHeight, sunPosition):
     # transform coordinate system
     meanlon = shape[:,:,0].mean()
     meanlat = shape[:,:,1].mean()
-    shape = lonlat2aeqd(shape)
+    shape = lonlat2aeqd(shape,meanlon,meanlat)
 
     azimuth = sunPosition['azimuth']
     altitude = sunPosition['altitude']

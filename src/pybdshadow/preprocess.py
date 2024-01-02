@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import shapely
 import pandas as pd
 import geopandas as gpd
-
+from shapely.geometry import  MultiPolygon
 
 def bd_preprocess(buildings, height=''):
     '''
@@ -79,6 +79,7 @@ def bd_preprocess(buildings, height=''):
         allbds['geometry'] = allbds.buffer(0)
     else:
         allbds = gpd.GeoDataFrame()
+    allbds.crs = 'EPSG:4326'
     return allbds
 
 def gdf_difference(gdf_a,gdf_b,col = 'building_id'):
@@ -89,7 +90,7 @@ def gdf_difference(gdf_a,gdf_b,col = 'building_id'):
     gdfb = gdf_b.copy()
     gdfb = gdfb[['geometry']]
     #判断重叠
-    from shapely.geometry import  MultiPolygon
+
     gdfa.crs = gdfb.crs
     gdfb = gpd.sjoin(gdfb,gdfa).groupby([col])['geometry'].apply(
             lambda df: MultiPolygon(list(df)).buffer(0)).reset_index()
@@ -116,7 +117,6 @@ def gdf_intersect(gdf_a,gdf_b,col = 'building_id'):
     gdfb = gdf_b.copy()
     gdfb = gdfb[['geometry']]
     #判断重叠
-    from shapely.geometry import  MultiPolygon
     gdfa.crs = gdfb.crs
     gdfb = gpd.sjoin(gdfb,gdfa).groupby([col])['geometry'].apply(
             lambda df: MultiPolygon(list(df)).buffer(0)).reset_index()

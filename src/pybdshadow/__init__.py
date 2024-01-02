@@ -32,7 +32,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-__version__ = '0.3.4'
+__version__ = '0.3.5'
 __author__ = 'Qing Yu <qingyu0815@foxmail.com>'
 
 # module level doc-string
@@ -40,6 +40,10 @@ __doc__ = """
 `pybdshadow` - Python package to generate building shadow geometry.
 """
 from .pybdshadow import *
+from .get_buildings import (
+    get_buildings_by_polygon,
+    get_buildings_by_bounds,
+)
 from .pybdshadow import (
     bdshadow_sunlight,
     bdshadow_pointlight
@@ -49,12 +53,21 @@ from .preprocess import (
 )
 from .visualization import (
     show_bdshadow,
+    show_sunshine,
 )
 from .analysis import (
     cal_sunshine,
     cal_sunshadows,
     cal_shadowcoverage,
     get_timetable
+)
+
+from .facade import (
+    cal_sunshine_facade
+)
+
+from .utils import (
+    extrude_poly
 )
 
 __all__ = ['bdshadow_sunlight',
@@ -64,5 +77,10 @@ __all__ = ['bdshadow_sunlight',
            'cal_sunshine',
            'cal_sunshadows',
            'cal_shadowcoverage',
-           'get_timetable'
+           'get_timetable',
+           'get_buildings_by_polygon',
+           'get_buildings_by_bounds',
+           'cal_sunshine_facade',
+           'show_sunshine',
+           'extrude_poly'
            ]
