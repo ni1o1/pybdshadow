@@ -6,6 +6,7 @@ suncalc
 keplergl
 scikit-opt
 transbigdata
+mapbox_vector_tile
 vt2geojson
 requests
 tqdm
