@@ -6,3 +6,7 @@ suncalc
 keplergl
 scikit-opt
 transbigdata
+vt2geojson
+requests
+tqdm
+retrying
