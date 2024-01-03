@@ -79,7 +79,7 @@ def bd_preprocess(buildings, height=''):
         allbds['geometry'] = allbds.buffer(0)
     else:
         allbds = gpd.GeoDataFrame()
-    allbds.crs = 'EPSG:4326'
+    allbds.crs = {'init': 'epsg:4326'}
     return allbds
 
 def gdf_difference(gdf_a,gdf_b,col = 'building_id'):
