@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="pybdshadow",
-    version="0.3.4",
+    version="0.3.5",
     author="Qing Yu",
     author_email="qingyu0815@foxmail.com",
     description="Python package to generate building shadow geometry",
@@ -17,7 +17,7 @@ setuptools.setup(
         "Bug Tracker": "https://github.com/ni1o1/pybdshadow/issues",
     },
     install_requires=[
-        "numpy", "pandas", "shapely", "geopandas", "matplotlib","suncalc","keplergl","transbigdata"
+        "numpy", "pandas", "shapely", "geopandas", "matplotlib","suncalc","keplergl","transbigdata","vt2geojson","requests","tqdm","retrying"
     ],
     classifiers=[
         "Operating System :: OS Independent",
