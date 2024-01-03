@@ -32,13 +32,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import numpy as np
 import geopandas as gpd
+from shapely.geometry import Polygon
 
 def show_bdshadow(buildings=gpd.GeoDataFrame(),
                   shadows=gpd.GeoDataFrame(),
                   ad=gpd.GeoDataFrame(),
                   ad_visualArea=gpd.GeoDataFrame(),
                   height='height',
-                  zoom='auto'):
+                  zoom='auto',
+                  vis_height = 800):
     '''
     Visualize the building and shadow with keplergl.
 
@@ -391,5 +393,144 @@ def show_bdshadow(buildings=gpd.GeoDataFrame(),
                                                 'building': True,
                                                 'water': True,
                                                 'land': True},
-                         'mapStyles': {}}}}, data=vmapdata, height=500)
+                         'mapStyles': {}}}}, data=vmapdata, height=vis_height)
     return vmap
+
+
+
+def show_sunshine(sunshine=gpd.GeoDataFrame(),
+                  zoom='auto',vis_height = 800):
+    '''
+    Visualize the sunshine with keplergl.
+
+    Parameters
+    --------------------
+    sunshine : GeoDataFrame
+        sunshine. coordinate system should be WGS84
+    zoom : number
+        Zoom level of the map
+
+    Return
+    --------------------
+    vmap : keplergl.keplergl.KeplerGl
+        Visualizations provided by keplergl
+    '''
+    def offset_wall(wall_poly):
+        wall_coords = np.array(wall_poly.exterior.coords)
+        wall_coords[:,0]+=wall_coords[:,2]*0.000000001
+        wall_coords[:,1]+=wall_coords[:,2]*0.000000001
+        return Polygon(wall_coords)
+    sunshine = sunshine.copy()
+    sunshine['geometry'] = sunshine['geometry'].apply(offset_wall)
+    vmapdata = {}
+    layers = []
+
+    bdcentroid = sunshine['geometry'].bounds[[
+        'minx', 'miny', 'maxx', 'maxy']]
+    lon_center, lat_center = bdcentroid['minx'].mean(
+    ), bdcentroid['miny'].mean()
+    lon_min, lon_max = bdcentroid['minx'].min(), bdcentroid['maxx'].max()
+    vmapdata['sunshine'] = sunshine
+
+
+    layers.append(
+        {'id': 'lz48o4',
+            'type': 'geojson',
+                    'config': {
+                        'dataId': 'sunshine',
+                        'label': 'sunshine',
+                        'color': [73, 73, 73],
+                        'highlightColor': [252, 242, 26, 255],
+                        'columns': {'geojson': 'geometry'},
+                        'isVisible': True,
+                        'visConfig': {
+                            'opacity': 1,
+                            'strokeOpacity': 1,
+                            'thickness': 0.5,
+                            'strokeColor': [255, 153, 31],
+                            'colorRange': {'name': 'UberPool 9',
+                                        'type': 'sequential',
+                                        'category': 'Uber',
+        'colors': ['#2C51BE',
+         '#482BBD',
+         '#7A0DA6',
+         '#AE0E7F',
+         '#CF1750',
+         '#E31A1A',
+         '#FD7900',
+         '#FAC200',
+         '#FAE300'],
+        'reversed': False},
+                            'strokeColorRange': {'name': 'Global Warming',
+                                                'type': 'sequential',
+                                                'category': 'Uber',
+                                                'colors': ['#5A1846',
+                                                            '#900C3F',
+                                                            '#C70039',
+                                                            '#E3611C',
+                                                            '#F1920E',
+                                                            '#FFC300']},
+                            'radius': 10,
+                            'sizeRange': [0, 10],
+                            'radiusRange': [0, 50],
+                            'heightRange': [0, 500],
+                            'elevationScale': 5,
+                            'enableElevationZoomFactor': True,
+                            'stroked': False,
+                            'filled': True,
+                            'enable3d': False,
+                            'wireframe': False},
+                        'hidden': False,
+                        'textLabel': [{
+                            'field': None,
+                                    'color': [255, 255, 255],
+                                    'size': 18,
+                                    'offset': [0, 0],
+                                    'anchor': 'start',
+                                    'alignment': 'center'}]},
+                    'visualChannels': {
+                        'colorField': {'name': 'Hour', 'type': 'real'},
+                        'colorScale': 'quantize',
+                        'strokeColorField': None,
+                        'strokeColorScale': 'quantize',
+                        'sizeField': None,
+                        'sizeScale': 'linear',
+                        'heightField': None,
+                        'heightScale': 'linear',
+                                    'radiusField': None,
+                                    'radiusScale': 'linear'}})
+    try:
+        from keplergl import KeplerGl
+    except ImportError:
+        raise ImportError(
+            "Please install keplergl, run "
+            "the following code in cmd: pip install keplergl")
+
+    if zoom == 'auto':
+        zoom = 10.5-np.log(lon_max-lon_min)/np.log(2)
+    vmap = KeplerGl(config={
+        'version': 'v1',
+        'config': {
+            'visState': {
+                'filters': [],
+                'layers': layers,
+                'layerBlending': 'normal',
+                'animationConfig': {'currentTime': None, 'speed': 1}},
+            'mapState': {'bearing': 30,
+                         'dragRotate': True,
+                         'latitude': lat_center,
+                         'longitude': lon_center,
+                         'pitch': 50,
+                         'zoom': zoom,
+                         'isSplit': False},
+            'mapStyle': {'styleType': 'light',
+                         'topLayerGroups': {},
+                         'visibleLayerGroups': {'label': True,
+                                                'road': True,
+                                                'border': False,
+                                                'building': True,
+                                                'water': True,
+                                                'land': True},
+                         'mapStyles': {}}}}, data=vmapdata, height=vis_height)
+    return vmap
+
