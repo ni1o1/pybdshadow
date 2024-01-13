@@ -39,7 +39,7 @@ from .utils import (
     lonlat2aeqd,
     aeqd2lonlat
 )
-from .preprocess import gdf_difference,gdf_intersect
+from .preprocess import gdf_difference, gdf_intersect
 
 
 def calSunShadow_vector(shape, shapeHeight, sunPosition):
@@ -61,9 +61,9 @@ def calSunShadow_vector(shape, shapeHeight, sunPosition):
         The shadow of the building on the ground. shape = [n,5,2]
     '''
     # transform coordinate system
-    meanlon = shape[:,:,0].mean()
-    meanlat = shape[:,:,1].mean()
-    shape = lonlat2aeqd(shape,meanlon,meanlat)
+    meanlon = shape[:, :, 0].mean()
+    meanlat = shape[:, :, 1].mean()
+    shape = lonlat2aeqd(shape, meanlon, meanlat)
 
     azimuth = sunPosition['azimuth']
     altitude = sunPosition['altitude']
@@ -72,25 +72,26 @@ def calSunShadow_vector(shape, shapeHeight, sunPosition):
     distance = shapeHeight/math.tan(altitude)
 
     # calculate the offset of the projection position
-    lonDistance = distance*math.sin(azimuth) 
+    lonDistance = distance*math.sin(azimuth)
     lonDistance = lonDistance.reshape((n, 1))
     latDistance = distance*math.cos(azimuth)
     latDistance = latDistance.reshape((n, 1))
 
-    shadowShape = np.zeros((n, 5, 2)) # n buildings, each building has 5 points, each point has 2 dimensions
+    # n buildings, each building has 5 points, each point has 2 dimensions
+    shadowShape = np.zeros((n, 5, 2))
 
-    shadowShape[:, 0:2, :] += shape  
+    shadowShape[:, 0:2, :] += shape
     shadowShape[:, 2:4, 0] = shape[:, :, 0] + lonDistance
     shadowShape[:, 2:4, 1] = shape[:, :, 1] + latDistance
 
     shadowShape[:, [2, 3], :] = shadowShape[:, [3, 2], :]
     shadowShape[:, 4, :] = shadowShape[:, 0, :]
 
-    shadowShape = aeqd2lonlat(shadowShape,meanlon,meanlat)
+    shadowShape = aeqd2lonlat(shadowShape, meanlon, meanlat)
     return shadowShape
 
 
-def bdshadow_sunlight(buildings, date,  height='height', roof=False,include_building = True,ground=0):
+def bdshadow_sunlight(buildings, date,  height='height', roof=False, include_building=True, ground=0):
     '''
     Calculate the sunlight shadow of the buildings.
 
@@ -127,8 +128,9 @@ def bdshadow_sunlight(buildings, date,  height='height', roof=False,include_buil
 
     # obtain sun position
     sunPosition = get_position(date, lon, lat)
-    if ( sunPosition['altitude']<0):
-        raise ValueError("Given time before sunrise or after sunset")   # pragma: no cover
+    if (sunPosition['altitude'] < 0):
+        raise ValueError(
+            "Given time before sunrise or after sunset")   # pragma: no cover
     buildingshadow = building.copy()
 
     a = buildingshadow['geometry'].apply(lambda r: list(r.exterior.coords))
@@ -159,19 +161,17 @@ def bdshadow_sunlight(buildings, date,  height='height', roof=False,include_buil
         lambda r: Polygon(r))
     ground_shadow = gpd.GeoDataFrame(ground_shadow)
 
-
-
     ground_shadow = pd.concat([ground_shadow, building])
     ground_shadow = ground_shadow.groupby(['building_id'])['geometry'].apply(
         lambda df: MultiPolygon(list(df)).buffer(0)).reset_index()
-    
+
     ground_shadow['height'] = 0
     ground_shadow['type'] = 'ground'
 
     if not roof:
         if not include_building:
-            #从地面阴影裁剪建筑轮廓
-            ground_shadow = gdf_difference(ground_shadow,buildings)
+            # 从地面阴影裁剪建筑轮廓
+            ground_shadow = gdf_difference(ground_shadow, buildings)
         return ground_shadow
     else:
         def calwall_shadow(walldata, building):
@@ -210,16 +210,18 @@ def bdshadow_sunlight(buildings, date,  height='height', roof=False,include_buil
             # 取有遮挡的阴影
             building_shadow_height = gpd.sjoin(
                 gpd.GeoDataFrame(building_shadow_height), gpd.GeoDataFrame(building_roof))
+
             if len(building_shadow_height) == 0:
                 continue
             # 与屋顶做交集
-            building_roof = gdf_intersect(building_roof,building_shadow_height)
+            building_roof = gdf_intersect(
+                building_roof, building_shadow_height)
 
             # 再减去这个高度以上的建筑
             building_higher = building[building[height] > roof_height].copy()
-            building_roof = gdf_difference(building_roof,building_higher)
-            
-            #给出高度信息
+            building_roof = gdf_difference(building_roof, building_higher)
+
+            # 给出高度信息
             building_roof['height'] = roof_height
             building_roof = building_roof[-building_roof['geometry'].is_empty]
 
@@ -231,20 +233,22 @@ def bdshadow_sunlight(buildings, date,  height='height', roof=False,include_buil
                 ['height', 'building_id', 'geometry']]
             roof_shadow['type'] = 'roof'
 
+
         if not include_building:
-            #从地面阴影裁剪建筑轮廓
-            ground_shadow = gdf_difference(ground_shadow,buildings)
-        
+            # 从地面阴影裁剪建筑轮廓
+            ground_shadow = gdf_difference(ground_shadow, buildings)
+
         shadows = pd.concat([roof_shadow, ground_shadow])
         shadows.crs = None
         shadows['geometry'] = shadows.buffer(0.000001).buffer(-0.000001)
+
         return shadows
 
 
 def calPointLightShadow_vector(shape, shapeHeight, pointLight):
     '''
     calculate shadow for a point light
-    
+
     Parameters
     ----------
     shape : numpy.array
@@ -253,7 +257,7 @@ def calPointLightShadow_vector(shape, shapeHeight, pointLight):
         height of building, shape = [n,1], n is the number of buildings
     pointLight : dict
         point light, pointLight = {'position':[lon,lat,height]}
-    
+
     Returns
     -------
     shadowShape : numpy.array
@@ -282,9 +286,10 @@ def calPointLightShadow_vector(shape, shapeHeight, pointLight):
     shadowShape[:, 3, :] = shape[:, 0, :] + \
         vertexToLightVector[:, 0, :]*scale
 
-    shadowShape[:, 4, :] = shadowShape[:, 0, :] 
+    shadowShape[:, 4, :] = shadowShape[:, 0, :]
 
     return shadowShape
+
 
 def bdshadow_pointlight(buildings,
                         pointlon,
@@ -310,7 +315,7 @@ def bdshadow_pointlight(buildings,
         Column name of building height(meter).
     ground : number
         Height of the ground
-    
+
     Returns
     ----------
     shadows : GeoDataFrame
@@ -330,18 +335,20 @@ def bdshadow_pointlight(buildings,
     # building to walls
     buildingshadow = building.copy()
 
-    a = buildingshadow['geometry'].apply(lambda r: list(r.exterior.coords))  #裸格式的几何
+    a = buildingshadow['geometry'].apply(
+        lambda r: list(r.exterior.coords))  # 裸格式的几何
     buildingshadow['wall'] = a  #
-    #print(a[0])
-    buildingshadow = buildingshadow.set_index(['building_id']) #设置阴影所对应的id
-    a = buildingshadow.apply(lambda x: pd.Series(x['wall']), axis=1).unstack()  #压缩为一个数组
+    # print(a[0])
+    buildingshadow = buildingshadow.set_index(['building_id'])  # 设置阴影所对应的id
+    a = buildingshadow.apply(lambda x: pd.Series(
+        x['wall']), axis=1).unstack()  # 压缩为一个数组
     walls = a[- a.isnull()].reset_index().sort_values(
-        by=['building_id', 'level_0'])  #重新排序
-    walls = pd.merge(walls, buildingshadow['height'].reset_index())#与高度融合
-    
+        by=['building_id', 'level_0'])  # 重新排序
+    walls = pd.merge(walls, buildingshadow['height'].reset_index())  # 与高度融合
+
     walls['x1'] = walls[0].apply(lambda r: r[0])  #
     walls['y1'] = walls[0].apply(lambda r: r[1])
-    walls['x2'] = walls['x1'].shift(-1)  #向量中的序号全部向前提了一个
+    walls['x2'] = walls['x1'].shift(-1)  # 向量中的序号全部向前提了一个
     walls['y2'] = walls['y1'].shift(-1)
     walls = walls[walls['building_id'] == walls['building_id'].shift(-1)]
     walls = walls[['x1', 'y1', 'x2', 'y2', 'building_id', 'height']]
@@ -355,14 +362,16 @@ def bdshadow_pointlight(buildings,
     shadowShape = calPointLightShadow_vector(
         walls_shape, walls['height'].values, pointLightPosition)
 
-    walls['geometry'] = list(shadowShape)  #阴影存储
-    walls['geometry'] = walls['geometry'].apply(lambda r: Polygon(r))  #将numpy转换成polygon形式
-    walls = gpd.GeoDataFrame(walls)  #8列 x1 ， y1 ，x2 ， y2 ， building_id ， height ，  wall ，shadow 
-    wallsBuilding = pd.concat([walls, building]) #
-    #print(wallsBuilding)
+    walls['geometry'] = list(shadowShape)  # 阴影存储
+    walls['geometry'] = walls['geometry'].apply(
+        lambda r: Polygon(r))  # 将numpy转换成polygon形式
+    # 8列 x1 ， y1 ，x2 ， y2 ， building_id ， height ，  wall ，shadow
+    walls = gpd.GeoDataFrame(walls)
+    wallsBuilding = pd.concat([walls, building])
+    # print(wallsBuilding)
     if merge:
         wallsBuilding = wallsBuilding.groupby(['building_id'])['geometry'].apply(
             lambda df: MultiPolygon(list(df)).buffer(0)).reset_index()
-        #print(wallsBuilding)
-    shadows=wallsBuilding
+        # print(wallsBuilding)
+    shadows = wallsBuilding
     return shadows

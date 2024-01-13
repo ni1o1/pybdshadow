@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import numpy as np
 import geopandas as gpd
 from shapely.geometry import Polygon
-
+import pandas as pd
 def show_bdshadow(buildings=gpd.GeoDataFrame(),
                   shadows=gpd.GeoDataFrame(),
                   ad=gpd.GeoDataFrame(),
@@ -421,7 +421,15 @@ def show_sunshine(sunshine=gpd.GeoDataFrame(),
         wall_coords[:,1]+=wall_coords[:,2]*0.000000001
         return Polygon(wall_coords)
     sunshine = sunshine.copy()
-    sunshine['geometry'] = sunshine['geometry'].apply(offset_wall)
+
+    sunshine_wall = sunshine[sunshine['type'] == 'wall']
+    sunshine_nonwall = sunshine[sunshine['type'] != 'wall']
+    sunshine_wall['geometry'] = sunshine_wall['geometry'].apply(offset_wall)
+
+    sunshine = gpd.GeoDataFrame(pd.concat(
+        [sunshine_nonwall, sunshine_wall], ignore_index=True))
+
+
     vmapdata = {}
     layers = []
 

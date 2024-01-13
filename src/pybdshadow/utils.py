@@ -35,7 +35,9 @@ import shapely
 import geopandas as gpd
 import pandas as pd
 from pyproj import CRS,Transformer
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon,MultiPolygon
+import pvlib
+from pvlib import location
 
 def extrude_poly(poly,h):
     poly_coords = np.array(poly.exterior.coords)
@@ -199,3 +201,107 @@ def count_overlapping_features(gdf,buffer = True):
         ['id'])['index_right'].count().rename('count').reset_index()
     out_gdf = pd.merge(new_gdf, overlapcount)
     return out_gdf
+
+def calculate_irradiance(row, lat, lon):
+    """
+    Calculate the solar irradiance for a given row with datetime.
+    """
+    site = location.Location(lat, lon)
+    time = pd.DatetimeIndex([row['datetime']])  # 将单个时间点转换为DatetimeIndex
+
+    # 计算太阳位置
+    solar_position = site.get_solarposition(time)
+
+    # 获取清晰天空模型的辐射
+    clearsky = site.get_clearsky(time)
+    
+
+    return clearsky['ghi'].iloc[0]  # 返回全球水平辐照度(ghi)
+
+def calculate_irradiance_gdf(gdf, lat, lon):
+    """
+    Calculate the solar irradiance for each row in a GeoDataFrame with a datetime.
+    Assumes the GeoDataFrame has a column named 'datetime'.
+    
+    Parameters:
+    gdf : GeoDataFrame
+        The GeoDataFrame with a 'datetime' column.
+    lat : float
+        Latitude for the location.
+    lon : float
+        Longitude for the location.
+
+    Returns:
+    GeoDataFrame
+        The input GeoDataFrame with added columns for solar position and clear sky data.
+    """
+    site = location.Location(lat, lon)
+
+    # Convert the datetime column to a DatetimeIndex
+    times = pd.DatetimeIndex(gdf['date'])
+
+    # Calculate the solar position for all times
+    solar_position = site.get_solarposition(times)
+
+    # Get clear sky model irradiance for all times
+    clearsky = site.get_clearsky(times)
+
+    # Add the solar position and clear sky data to the GeoDataFrame
+    for col in solar_position.columns:
+        gdf['solar_' + col] = solar_position[col].values
+
+    for col in clearsky.columns:
+        gdf['clearsky_' + col] = clearsky[col].values
+
+    return gdf
+
+def calculate_3d_area_pro(arr):
+    # 计算法线
+    plane_norm = calculate_normal(arr)
+
+    # 计算xz平面和yz平面的面积
+    xz_poly = Polygon(arr[:, [0, 2]])
+    xz_poly_area = xz_poly.area
+
+    yz_poly = Polygon(arr[:, [1, 2]])
+    yz_poly_area = yz_poly.area
+
+    if xz_poly_area < yz_poly_area:
+        # 选择yz平面
+        yz_poly_area = yz_poly.area
+        # x轴向量
+        x_axis = np.array([1, 0, 0])
+        # 计算法线与Z轴的夹角
+        angle_with_y = np.arccos(np.clip(np.dot(plane_norm, x_axis) / np.linalg.norm(plane_norm), -1.0, 1.0))
+        # 调整投影面积以得到三维空间中的实际面积
+        area_3d = abs(yz_poly_area / np.cos(angle_with_y))
+    else:
+        # 选择xz平面
+        xz_poly_area = xz_poly.area
+        # x轴向量
+        y_axis = np.array([0, 1, 0])
+        # 计算法线与Z轴的夹角
+        angle_with_y = np.arccos(np.clip(np.dot(plane_norm, y_axis) / np.linalg.norm(plane_norm), -1.0, 1.0))
+        # 调整投影面积以得到三维空间中的实际面积
+        area_3d = abs(xz_poly_area / np.cos(angle_with_y))
+    return area_3d
+
+def convert_buildings_to_aeqd(buildings_gdf, center_lon, center_lat):
+
+    def convert_geometry_to_aeqd(geometry, transformer):
+        if isinstance(geometry, Polygon):
+            lonlat_coords = np.array(geometry.exterior.coords).reshape(1, -1, 2)
+        elif isinstance(geometry, MultiPolygon):
+            lonlat_coords = np.concatenate([np.array(poly.exterior.coords).reshape(1, -1, 2) for poly in geometry.geoms], axis=1)
+        else:
+            return geometry
+    
+        proj_coords = transformer.transform(lonlat_coords[:, :, 0], lonlat_coords[:, :, 1])
+        proj_coords = np.array(proj_coords).transpose([1, 2, 0])
+        return Polygon(np.squeeze(proj_coords))
+    epsg = CRS.from_proj4("+proj=aeqd +lat_0=" + str(center_lat) + " +lon_0=" + str(center_lon) + " +datum=WGS84")
+    transformer = Transformer.from_crs("EPSG:4326", epsg, always_xy=True)
+
+    buildings_aeqd_gdf = buildings_gdf.copy()
+    buildings_aeqd_gdf['geometry'] = buildings_gdf['geometry'].apply(lambda geom: convert_geometry_to_aeqd(geom, transformer))
+    return buildings_aeqd_gdf

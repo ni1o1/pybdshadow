@@ -119,7 +119,7 @@ def gdf_intersect(gdf_a,gdf_b,col = 'building_id'):
     #判断重叠
     gdfa.crs = gdfb.crs
     gdfb = gpd.sjoin(gdfb,gdfa).groupby([col])['geometry'].apply(
-            lambda df: MultiPolygon(list(df)).buffer(0)).reset_index()
+            lambda df: df.unary_union).reset_index()
     #分割有重叠和无重叠的
     gdfb['tmp'] = 1
     gdfa_1 = pd.merge(gdfa,gdfb[[col,'tmp']],how = 'left')
