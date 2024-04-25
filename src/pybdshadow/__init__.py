@@ -62,10 +62,6 @@ from .analysis import (
     get_timetable
 )
 
-from .facade import (
-    cal_sunshine_facade
-)
-
 from .utils import (
     extrude_poly
 )
