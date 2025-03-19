@@ -1,10 +1,43 @@
-cff-version: 0.1.0
-title: pybdshadow - a python package to analyze building shadow
+cff-version: 1.2.0
+title: "Global Estimation of Building-Integrated Facade and Rooftop Photovoltaic Potential by Integrating 3D Building Footprint and Spatio-Temporal Datasets"
 authors:
-  - name: Qing Yu
-    orcid: 0000-0003-2513-2969
-  - name: Ge Li
-date-released:
-license: "BSD 3"
+  - family-names: Yu
+    given-names: Qing
+    affiliation: "School of Urban Planning and Design, Peking University Shenzhen Graduate School"
+  - family-names: Dong
+    given-names: Kechuan
+    affiliation: "Center for Spatial Information Science, University of Tokyo"
+  - family-names: Guo
+    given-names: Zhiling
+    affiliation: "Department of Building Environment and Energy Engineering, The Hong Kong Polytechnic University"
+  - family-names: Xu
+    given-names: Jian
+    affiliation: "Department of Building Environment and Energy Engineering, The Hong Kong Polytechnic University"
+  - family-names: Li
+    given-names: Jiaxing
+    affiliation: "School of Urban Planning and Design, Peking University Shenzhen Graduate School"
+  - family-names: Tan
+    given-names: Hongjun
+    affiliation: "Department of Building Environment and Energy Engineering, The Hong Kong Polytechnic University"
+  - family-names: Jin
+    given-names: Yanxiu
+    affiliation: "Center for Spatial Information Science, University of Tokyo"
+  - family-names: Yuan
+    given-names: Jian
+    affiliation: "School of Urban Planning and Design, Peking University Shenzhen Graduate School"
+  - family-names: Zhang
+    given-names: Haoran
+    affiliation: "Department of Building Environment and Energy Engineering, The Hong Kong Polytechnic University"
+  - family-names: Liu
+    given-names: Junwei
+    affiliation: "Department of Building Environment and Energy Engineering, The Hong Kong Polytechnic University"
+  - family-names: Chen
+    given-names: Qi
+    affiliation: "School of Geography and Information Engineering, China University of Geosciences (Wuhan)"
+  - family-names: Yan
+    given-names: Jinyue
+    affiliation: "Department of Building Environment and Energy Engineering, The Hong Kong Polytechnic University"
 repository-code: "https://github.com/ni1o1/pybdshadow"
-message: "If you use this software, please cite relevant articles below."
+date-published: "2025"
+doi: "10.1016/j.ynexs.2025.100060."
+year: "2025"
